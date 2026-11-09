@@ -114,6 +114,12 @@ export function AuthProvider({ children }) {
     return response.data;
   };
 
+  // Update user profile in state and localStorage
+  const updateUser = useCallback((updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem('sweety_user', JSON.stringify(updatedUser));
+  }, []);
+
   const value = {
     user,
     token,
@@ -122,6 +128,7 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

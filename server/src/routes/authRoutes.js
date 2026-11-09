@@ -5,7 +5,8 @@ const router = express.Router();
 const {
   register,
   login,
-  changePassword
+  changePassword,
+  updateProfile
 } = require("../controllers/authController");
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -19,6 +20,9 @@ router.post("/login", login);
 
 // Change password
 router.put("/change-password", authMiddleware, changePassword);
+
+// Update user profile
+router.put("/profile", authMiddleware, updateProfile);
 
 // Get currently logged-in user
 router.get("/me", authMiddleware, async (req, res) => {

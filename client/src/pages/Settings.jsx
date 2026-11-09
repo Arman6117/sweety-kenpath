@@ -29,6 +29,8 @@ import {
   Mail,
   User,
   Loader2,
+  Pencil,
+  Check,
 } from "lucide-react";
 
 const navigation = [
@@ -52,11 +54,34 @@ function formatMemberSince(dateString) {
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
 
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  // Profile Form State
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+  });
+  const [profileErrors, setProfileErrors] = useState({});
+  const [profileSuccessMessage, setProfileSuccessMessage] = useState("");
+  const [profileServerError, setProfileServerError] = useState("");
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+  // Start Profile Edit
+  const handleStartEditProfile = () => {
+    setProfileForm({
+      name: user?.name || "",
+      email: user?.email || "",
+    });
+    setProfileErrors({});
+    setProfileSuccessMessage("");
+    setProfileServerError("");
+    setIsEditingProfile(true);
+  };
 
   // Security Form State
   const [passwords, setPasswords] = useState({
@@ -88,6 +113,98 @@ export default function Settings() {
   const displayName = user?.name || "Friend";
   const emailAddress = user?.email || "No email available";
   const memberSince = formatMemberSince(user?.createdAt);
+
+  // Handle Profile Form Input Changes
+  const handleProfileChange = (e) => {
+    const { name, value } = e.target;
+    setProfileForm((prev) => ({ ...prev, [name]: value }));
+    if (profileErrors[name]) {
+      setProfileErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+    if (profileSuccessMessage) {
+      setProfileSuccessMessage("");
+    }
+    if (profileServerError) {
+      setProfileServerError("");
+    }
+  };
+
+  // Cancel Profile Edit
+  const handleCancelProfileEdit = () => {
+    setIsEditingProfile(false);
+    setProfileForm({
+      name: user?.name || "",
+      email: user?.email || "",
+    });
+    setProfileErrors({});
+    setProfileServerError("");
+  };
+
+  // Submit Profile Update to PUT /api/auth/profile
+  const handleProfileSubmit = async (e) => {
+    e.preventDefault();
+    setProfileSuccessMessage("");
+    setProfileServerError("");
+
+    const errors = {};
+    const trimmedName = profileForm.name.trim();
+    const normalizedEmail = profileForm.email.trim().toLowerCase();
+
+    if (!trimmedName) {
+      errors.name = "Full name is required.";
+    }
+
+    if (!normalizedEmail) {
+      errors.email = "Email address is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      errors.email = "Please provide a valid email address.";
+    }
+
+    setProfileErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
+    setIsSavingProfile(true);
+
+    try {
+      const response = await api.put("/api/auth/profile", {
+        name: trimmedName,
+        email: normalizedEmail,
+      });
+
+      // Update AuthContext and localStorage
+      updateUser(response.data.user);
+
+      setProfileSuccessMessage(
+        response.data?.message || "Profile updated successfully."
+      );
+      setIsEditingProfile(false);
+    } catch (err) {
+      console.error("Update profile error:", err);
+      const status = err.response?.status;
+      const apiMessage = err.response?.data?.message;
+
+      if (status === 409) {
+        setProfileServerError(
+          apiMessage || "An account with this email already exists."
+        );
+      } else if (status === 400) {
+        setProfileServerError(
+          apiMessage || "Invalid profile data. Please check your inputs."
+        );
+      } else {
+        setProfileServerError(
+          apiMessage ||
+            err.message ||
+            "Unable to update profile. Please check your connection and try again."
+        );
+      }
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
 
   // Handle Security Form Change
   const handlePasswordChange = (e) => {
@@ -490,7 +607,7 @@ export default function Settings() {
           <div className="space-y-8">
             {/* SECTION A: Account Profile */}
             <section className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
-              <div className="mb-6 flex items-center justify-between">
+              <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <div className="flex items-center gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-xs">
                     <User size={22} />
@@ -500,88 +617,190 @@ export default function Settings() {
                       Account Profile
                     </h3>
                     <p className="text-xs text-slate-400">
-                      Your registered account details (read-only)
+                      {isEditingProfile
+                        ? "Edit your name and email address below"
+                        : "Your registered account details"}
                     </p>
                   </div>
                 </div>
-                <span className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                  Verified
-                </span>
-              </div>
 
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                {/* Full Name */}
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    Full Name
-                  </label>
-                  <div className="relative">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                      <UserRound size={17} />
-                    </div>
-                    <input
-                      type="text"
-                      readOnly
-                      value={displayName}
-                      className="w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-50/80 py-3 pl-11 pr-4 text-sm font-medium text-slate-700 focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Email Address */}
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                      <Mail size={17} />
-                    </div>
-                    <input
-                      type="email"
-                      readOnly
-                      value={emailAddress}
-                      className="w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-50/80 py-3 pl-11 pr-4 text-sm font-medium text-slate-700 focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Member Since */}
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    Member Since
-                  </label>
-                  <div className="relative">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                      <Calendar size={17} />
-                    </div>
-                    <input
-                      type="text"
-                      readOnly
-                      value={memberSince}
-                      className="w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-50/80 py-3 pl-11 pr-4 text-sm font-medium text-slate-700 focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Account Status */}
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    Account Status
-                  </label>
-                  <div className="relative">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-emerald-600">
-                      <Shield size={17} />
-                    </div>
-                    <input
-                      type="text"
-                      readOnly
-                      value="Active & Protected"
-                      className="w-full cursor-not-allowed rounded-xl border border-emerald-100 bg-emerald-50/50 py-3 pl-11 pr-4 text-sm font-semibold text-emerald-800 focus:outline-none"
-                    />
-                  </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                    Verified
+                  </span>
+                  {!isEditingProfile && (
+                    <button
+                      type="button"
+                      onClick={handleStartEditProfile}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                    >
+                      <Pencil size={14} />
+                      Edit Profile
+                    </button>
+                  )}
                 </div>
               </div>
+
+              {profileSuccessMessage && (
+                <div className="mb-6 flex items-start gap-2.5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-medium text-emerald-800">
+                  <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-emerald-600" />
+                  <p>{profileSuccessMessage}</p>
+                </div>
+              )}
+
+              {profileServerError && (
+                <div className="mb-6 flex items-start gap-2.5 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">
+                  <AlertCircle size={18} className="mt-0.5 shrink-0 text-red-600" />
+                  <p>{profileServerError}</p>
+                </div>
+              )}
+
+              <form onSubmit={handleProfileSubmit} noValidate>
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                  {/* Full Name */}
+                  <div>
+                    <label
+                      htmlFor="profile-name"
+                      className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500"
+                    >
+                      Full Name
+                    </label>
+                    <div className="relative">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                        <UserRound size={17} />
+                      </div>
+                      <input
+                        id="profile-name"
+                        name="name"
+                        type="text"
+                        readOnly={!isEditingProfile}
+                        disabled={isSavingProfile}
+                        value={isEditingProfile ? profileForm.name : displayName}
+                        onChange={handleProfileChange}
+                        placeholder="Your full name"
+                        className={`w-full rounded-xl border py-3 pl-11 pr-4 text-sm font-medium text-slate-700 transition focus:outline-none ${
+                          !isEditingProfile
+                            ? "cursor-not-allowed border-slate-200 bg-slate-50/80"
+                            : profileErrors.name
+                            ? "border-red-300 bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                            : "border-slate-200 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                        }`}
+                      />
+                    </div>
+                    {profileErrors.name && (
+                      <div className="mt-1.5 flex items-center gap-1.5 text-xs text-red-600">
+                        <AlertCircle size={14} className="shrink-0" />
+                        <span>{profileErrors.name}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Email Address */}
+                  <div>
+                    <label
+                      htmlFor="profile-email"
+                      className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500"
+                    >
+                      Email Address
+                    </label>
+                    <div className="relative">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                        <Mail size={17} />
+                      </div>
+                      <input
+                        id="profile-email"
+                        name="email"
+                        type="email"
+                        readOnly={!isEditingProfile}
+                        disabled={isSavingProfile}
+                        value={isEditingProfile ? profileForm.email : emailAddress}
+                        onChange={handleProfileChange}
+                        placeholder="name@example.com"
+                        className={`w-full rounded-xl border py-3 pl-11 pr-4 text-sm font-medium text-slate-700 transition focus:outline-none ${
+                          !isEditingProfile
+                            ? "cursor-not-allowed border-slate-200 bg-slate-50/80"
+                            : profileErrors.email
+                            ? "border-red-300 bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                            : "border-slate-200 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                        }`}
+                      />
+                    </div>
+                    {profileErrors.email && (
+                      <div className="mt-1.5 flex items-center gap-1.5 text-xs text-red-600">
+                        <AlertCircle size={14} className="shrink-0" />
+                        <span>{profileErrors.email}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Member Since */}
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      Member Since
+                    </label>
+                    <div className="relative">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                        <Calendar size={17} />
+                      </div>
+                      <input
+                        type="text"
+                        readOnly
+                        value={memberSince}
+                        className="w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-50/80 py-3 pl-11 pr-4 text-sm font-medium text-slate-700 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Account Status */}
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      Account Status
+                    </label>
+                    <div className="relative">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-emerald-600">
+                        <Shield size={17} />
+                      </div>
+                      <input
+                        type="text"
+                        readOnly
+                        value="Active & Protected"
+                        className="w-full cursor-not-allowed rounded-xl border border-emerald-100 bg-emerald-50/50 py-3 pl-11 pr-4 text-sm font-semibold text-emerald-800 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Edit Mode Action Buttons */}
+                {isEditingProfile && (
+                  <div className="mt-6 flex items-center justify-end gap-3 border-t border-slate-100 pt-5">
+                    <button
+                      type="button"
+                      onClick={handleCancelProfileEdit}
+                      disabled={isSavingProfile}
+                      className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSavingProfile}
+                      className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                      {isSavingProfile ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          <span>Saving Changes...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Check size={16} />
+                          <span>Save Changes</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </form>
             </section>
 
             {/* SECTION B: Security (Change Password) */}

@@ -230,8 +230,99 @@ const changePassword = async (req, res) => {
   }
 };
 
+// UPDATE USER PROFILE
+const updateProfile = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized request."
+      });
+    }
+
+    if (!name || !email) {
+      return res.status(400).json({
+        success: false,
+        message: "Name and email are required."
+      });
+    }
+
+    const trimmedName = typeof name === "string" ? name.trim() : "";
+    const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+
+    if (!trimmedName) {
+      return res.status(400).json({
+        success: false,
+        message: "Name is required."
+      });
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a valid email address."
+      });
+    }
+
+    // Check whether the email is already used by another user account
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        email: normalizedEmail,
+        NOT: { id: userId }
+      }
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "An account with this email already exists."
+      });
+    }
+
+    // Update user profile in database
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: trimmedName,
+        email: normalizedEmail
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully.",
+      user: updatedUser
+    });
+
+  } catch (error) {
+    console.error("Update profile error:", error);
+
+    if (error.code === "P2002") {
+      return res.status(409).json({
+        success: false,
+        message: "An account with this email already exists."
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to update profile. Please try again later."
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
-  changePassword
+  changePassword,
+  updateProfile
 };
