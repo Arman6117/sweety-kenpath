@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
+import AddReadingModal from "../components/AddReadingModal";
 import {
   Activity,
   LayoutDashboard,
@@ -59,9 +61,11 @@ function formatSlot(slot) {
 }
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Live state
   const [readings, setReadings] = useState([]);
@@ -129,6 +133,14 @@ export default function Dashboard() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Submit new reading to backend and refresh dashboard
+  const handleSaveReading = async (readingPayload) => {
+    const response = await api.post("/api/readings", readingPayload);
+    // Refresh both GET /api/readings and GET /api/reports/month-to-date
+    await handleRefresh();
+    return response.data;
   };
 
   const handleLogout = () => {
@@ -201,9 +213,19 @@ export default function Dashboard() {
           <nav className="space-y-2">
             {navigation.map((item) => {
               const Icon = item.icon;
+              const isAddReading = item.label === "Add Reading";
               return (
                 <button
                   key={item.label}
+                  onClick={() => {
+                    if (isAddReading) {
+                      setIsAddModalOpen(true);
+                    } else if (item.label === "Reading History") {
+                      navigate("/history");
+                    } else if (item.label === "Reports") {
+                      navigate("/reports");
+                    }
+                  }}
                   className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
                     item.active
                       ? "bg-emerald-50 text-emerald-700"
@@ -284,7 +306,16 @@ export default function Dashboard() {
                   return (
                     <button
                       key={item.label}
-                      onClick={() => setMobileMenuOpen(false)}
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        if (item.label === "Add Reading") {
+                          setIsAddModalOpen(true);
+                        } else if (item.label === "Reading History") {
+                          navigate("/history");
+                        } else if (item.label === "Reports") {
+                          navigate("/reports");
+                        }
+                      }}
                       className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
                         item.active
                           ? "bg-emerald-50 text-emerald-700"
@@ -432,7 +463,10 @@ export default function Dashboard() {
               </p>
             </div>
 
-            <button className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-50">
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-50"
+            >
               <Plus size={19} />
               Add Reading
             </button>
@@ -516,6 +550,13 @@ export default function Dashboard() {
                 <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-slate-400">
                   You haven't added any glucose measurements yet. Once you record readings, your history and monthly statistics will appear here.
                 </p>
+                <button
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="mt-4 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+                >
+                  <Plus size={16} />
+                  Add Your First Reading
+                </button>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -563,7 +604,10 @@ export default function Dashboard() {
 
             {readings.length > 0 && (
               <div className="mt-5 flex justify-end">
-                <button className="text-sm font-semibold text-emerald-700 hover:text-emerald-800">
+                <button
+                  onClick={() => navigate("/history")}
+                  className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+                >
                   View all readings →
                 </button>
               </div>
@@ -575,6 +619,13 @@ export default function Dashboard() {
           </footer>
         </main>
       </div>
+
+      {/* Add Reading Modal */}
+      <AddReadingModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSave={handleSaveReading}
+      />
     </div>
   );
 }
