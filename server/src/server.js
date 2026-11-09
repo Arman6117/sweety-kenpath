@@ -7,6 +7,7 @@ const prisma = require("./config/prisma");
 
 const authRoutes = require("./routes/authRoutes");
 const readingRoutes = require("./routes/readingRoutes");
+const reportRoutes = require("./routes/reportRoutes");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 // Authentication routes
 app.use("/api/auth", authRoutes);
 app.use("/api/readings", readingRoutes);
+app.use("/api/reports", reportRoutes);
 
 // Health check API
 app.get("/", (req, res) => {
