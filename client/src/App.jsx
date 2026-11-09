@@ -4,6 +4,7 @@ import { ProtectedRoute, PublicRoute } from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import ReadingHistory from './pages/ReadingHistory';
 import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 
@@ -33,6 +34,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Reports />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             }
           />

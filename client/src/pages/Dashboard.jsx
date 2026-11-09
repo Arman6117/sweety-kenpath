@@ -224,6 +224,8 @@ export default function Dashboard() {
                       navigate("/history");
                     } else if (item.label === "Reports") {
                       navigate("/reports");
+                    } else if (item.label === "Settings") {
+                      navigate("/settings");
                     }
                   }}
                   className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
@@ -314,6 +316,8 @@ export default function Dashboard() {
                           navigate("/history");
                         } else if (item.label === "Reports") {
                           navigate("/reports");
+                        } else if (item.label === "Settings") {
+                          navigate("/settings");
                         }
                       }}
                       className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition ${

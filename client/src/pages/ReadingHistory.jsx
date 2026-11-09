@@ -247,6 +247,7 @@ export default function ReadingHistory() {
               const isHistory = item.label === "Reading History";
               const isDashboard = item.label === "Dashboard";
               const isReports = item.label === "Reports";
+              const isSettings = item.label === "Settings";
 
               return (
                 <button
@@ -258,6 +259,8 @@ export default function ReadingHistory() {
                       navigate("/");
                     } else if (isReports) {
                       navigate("/reports");
+                    } else if (isSettings) {
+                      navigate("/settings");
                     }
                   }}
                   className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
@@ -341,6 +344,7 @@ export default function ReadingHistory() {
                   const isDashboard = item.label === "Dashboard";
                   const isHistory = item.label === "Reading History";
                   const isReports = item.label === "Reports";
+                  const isSettings = item.label === "Settings";
 
                   return (
                     <button
@@ -353,6 +357,8 @@ export default function ReadingHistory() {
                           navigate("/");
                         } else if (isReports) {
                           navigate("/reports");
+                        } else if (isSettings) {
+                          navigate("/settings");
                         }
                       }}
                       className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition ${

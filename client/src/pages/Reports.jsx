@@ -81,7 +81,9 @@ export default function Reports() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Tab state: 'daily' | 'month-to-date' | 'previous-month'
-  const [activeTab, setActiveTab] = useState("month-to-date");
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem("sweety_default_report_view") || "month-to-date";
+  });
   const [selectedDate, setSelectedDate] = useState(today);
 
   // Live report data
@@ -267,6 +269,7 @@ export default function Reports() {
               const isReports = item.label === "Reports";
               const isHistory = item.label === "Reading History";
               const isDashboard = item.label === "Dashboard";
+              const isSettings = item.label === "Settings";
 
               return (
                 <button
@@ -278,6 +281,8 @@ export default function Reports() {
                       navigate("/");
                     } else if (isHistory) {
                       navigate("/history");
+                    } else if (isSettings) {
+                      navigate("/settings");
                     }
                   }}
                   className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
@@ -361,6 +366,7 @@ export default function Reports() {
                   const isDashboard = item.label === "Dashboard";
                   const isHistory = item.label === "Reading History";
                   const isReports = item.label === "Reports";
+                  const isSettings = item.label === "Settings";
 
                   return (
                     <button
@@ -373,6 +379,8 @@ export default function Reports() {
                           navigate("/");
                         } else if (isHistory) {
                           navigate("/history");
+                        } else if (isSettings) {
+                          navigate("/settings");
                         }
                       }}
                       className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition ${

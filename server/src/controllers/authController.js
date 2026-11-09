@@ -152,7 +152,86 @@ const login = async (req, res) => {
   }
 };
 
+// CHANGE PASSWORD
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user?.userId;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Current password and new password are required."
+      });
+    }
+
+    if (typeof newPassword !== "string" || newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must contain at least 8 characters."
+      });
+    }
+
+    if (currentPassword === newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be different from current password."
+      });
+    }
+
+    // Find the user to get existing password hash
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found."
+      });
+    }
+
+    // Verify current password with bcrypt
+    const isCurrentValid = await bcrypt.compare(
+      currentPassword,
+      user.passwordHash
+    );
+
+    if (!isCurrentValid) {
+      return res.status(401).json({
+        success: false,
+        message: "Current password is incorrect."
+      });
+    }
+
+    // Hash new password with 12 salt rounds
+    const newPasswordHash = await bcrypt.hash(newPassword, 12);
+
+    // Update passwordHash in database
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash: newPasswordHash
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Password changed successfully."
+    });
+
+  } catch (error) {
+    console.error("Change password error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to change password. Please try again later."
+    });
+  }
+};
+
 module.exports = {
   register,
-  login
+  login,
+  changePassword
 };
