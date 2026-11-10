@@ -70,6 +70,7 @@ sweety-glucose-tracker/
 │   │   ├── App.jsx
 │   │   └── main.jsx
 │   ├── package.json
+│   ├── .env.example
 │   └── vite.config.js
 │
 ├── server/
@@ -237,6 +238,12 @@ From the `client` directory:
 npm run lint
 npm run build
 ```
+## Running Backend Tests
+
+From the `server` directory:
+
+```bash
+npm test
 
 ## Database Design
 
@@ -261,11 +268,19 @@ A unique database constraint prevents a user from recording more than one readin
 
 ## Future Improvements
 
+- Additional frontend automated tests.
 - Pagination for reading history.
-- Additional data visualization and trends.
-- Automated frontend and backend testing.
+- Enhanced data visualization and glucose trends.
 - Optional Docker-based deployment.
-- Additional reporting and export capabilities.
+- Additional reporting and data export capabilities.
+
+## Security Notes
+
+- Passwords are securely hashed using bcrypt.
+- Authentication is handled using JWT.
+- Protected APIs ensure users can access only their own records.
+- Environment variables are stored in local `.env` files.
+- Actual credentials and secrets must never be committed to GitHub.
 
 ## Author
 
