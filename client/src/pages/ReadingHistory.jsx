@@ -5,13 +5,15 @@ import api from "../api/axios";
 import AddReadingModal from "../components/AddReadingModal";
 import EditReadingModal from "../components/EditReadingModal";
 import DeleteReadingModal from "../components/DeleteReadingModal";
+import ThemeToggle from "../components/ThemeToggle";
+import ProfileDropdown from "../components/ProfileDropdown";
+import NotificationPopover from "../components/NotificationPopover";
 import {
   LayoutDashboard,
   Droplets,
   ClipboardList,
   BarChart3,
   Settings,
-  Bell,
   Plus,
   Heart,
   ChevronDown,
@@ -77,7 +79,6 @@ export default function ReadingHistory() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingReading, setEditingReading] = useState(null);
@@ -144,7 +145,6 @@ export default function ReadingHistory() {
   }, []);
 
   const handleLogout = () => {
-    setUserMenuOpen(false);
     setMobileMenuOpen(false);
     logout();
   };
@@ -420,60 +420,14 @@ export default function ReadingHistory() {
                 />
               </button>
 
-              <button className="rounded-xl border border-slate-100 bg-white p-3 text-slate-500 hover:bg-slate-50">
-                <Bell size={19} />
-              </button>
+              {/* Notification Center */}
+              <NotificationPopover />
+
+              {/* Theme Toggle */}
+              <ThemeToggle className="rounded-xl border border-slate-100 bg-white p-3 text-slate-500 hover:bg-slate-50" />
 
               {/* User Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen((prev) => !prev)}
-                  className="flex items-center gap-2 rounded-xl border border-slate-100 bg-white p-2 transition hover:bg-slate-50"
-                  aria-expanded={userMenuOpen}
-                >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
-                    <UserRound size={19} />
-                  </div>
-                  <span className="hidden text-sm font-semibold sm:block">
-                    {user?.name || "My Account"}
-                  </span>
-                  <ChevronDown
-                    size={15}
-                    className={`hidden text-slate-400 transition-transform sm:block ${
-                      userMenuOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                {userMenuOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-20"
-                      onClick={() => setUserMenuOpen(false)}
-                    />
-                    <div className="absolute right-0 z-30 mt-2 w-64 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl">
-                      <div className="border-b border-slate-100 px-3 py-2.5">
-                        <p className="truncate text-sm font-bold text-slate-900">
-                          {user?.name || "User"}
-                        </p>
-                        <p className="truncate text-xs text-slate-400">
-                          {user?.email}
-                        </p>
-                      </div>
-
-                      <div className="pt-2">
-                        <button
-                          onClick={handleLogout}
-                          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
-                        >
-                          <LogOut size={16} />
-                          Sign Out
-                        </button>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
+              <ProfileDropdown />
             </div>
           </header>
 

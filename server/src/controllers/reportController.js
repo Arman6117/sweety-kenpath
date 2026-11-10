@@ -193,5 +193,6 @@ const getPreviousMonthReport = async (req, res) => {
 module.exports = {
   getDailyReport,
   getMonthToDateReport,
-  getPreviousMonthReport
+  getPreviousMonthReport,
+  calculateSummary
 };

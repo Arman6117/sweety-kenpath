@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
+import ThemeToggle from "../components/ThemeToggle";
+import ProfileDropdown from "../components/ProfileDropdown";
+import NotificationPopover from "../components/NotificationPopover";
 import AddReadingModal from "../components/AddReadingModal";
 import api from "../api/axios";
 import {
@@ -9,7 +13,6 @@ import {
   ClipboardList,
   BarChart3,
   Settings as SettingsIcon,
-  Bell,
   Plus,
   Heart,
   ChevronDown,
@@ -31,6 +34,9 @@ import {
   Loader2,
   Pencil,
   Check,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 
 const navigation = [
@@ -55,8 +61,8 @@ function formatMemberSince(dateString) {
 export default function Settings() {
   const navigate = useNavigate();
   const { user, logout, updateUser } = useAuth();
+  const { theme, setTheme } = useTheme();
 
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -321,7 +327,6 @@ export default function Settings() {
   }, [preferencesSaved]);
 
   const handleLogout = () => {
-    setUserMenuOpen(false);
     setMobileMenuOpen(false);
     logout();
   };
@@ -520,60 +525,14 @@ export default function Settings() {
             </div>
 
             <div className="flex items-center gap-3">
-              <button className="rounded-xl border border-slate-100 bg-white p-3 text-slate-500 hover:bg-slate-50">
-                <Bell size={19} />
-              </button>
+              {/* Notification Center */}
+              <NotificationPopover />
+
+              {/* Theme Toggle */}
+              <ThemeToggle className="rounded-xl border border-slate-100 bg-white p-3 text-slate-500 hover:bg-slate-50" />
 
               {/* User Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen((prev) => !prev)}
-                  className="flex items-center gap-2 rounded-xl border border-slate-100 bg-white p-2 transition hover:bg-slate-50"
-                  aria-expanded={userMenuOpen}
-                >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
-                    <UserRound size={19} />
-                  </div>
-                  <span className="hidden text-sm font-semibold sm:block">
-                    {user?.name || "My Account"}
-                  </span>
-                  <ChevronDown
-                    size={15}
-                    className={`hidden text-slate-400 transition-transform sm:block ${
-                      userMenuOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                {userMenuOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-20"
-                      onClick={() => setUserMenuOpen(false)}
-                    />
-                    <div className="absolute right-0 z-30 mt-2 w-64 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl">
-                      <div className="border-b border-slate-100 px-3 py-2.5">
-                        <p className="truncate text-sm font-bold text-slate-900">
-                          {user?.name || "User"}
-                        </p>
-                        <p className="truncate text-xs text-slate-400">
-                          {user?.email}
-                        </p>
-                      </div>
-
-                      <div className="pt-2">
-                        <button
-                          onClick={handleLogout}
-                          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
-                        >
-                          <LogOut size={16} />
-                          Sign Out
-                        </button>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
+              <ProfileDropdown />
             </div>
           </header>
 
@@ -1030,6 +989,65 @@ export default function Settings() {
                 <p className="mt-2 text-xs text-slate-400">
                   Select which tab opens first when navigating to the Reports section.
                 </p>
+
+                {/* Theme Mode Preference */}
+                <div className="mt-6 border-t border-slate-100 pt-5">
+                  <label className="mb-2.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Theme Appearance
+                  </label>
+                  <div className="grid grid-cols-3 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTheme("light");
+                        setPreferencesSaved(true);
+                      }}
+                      className={`flex flex-col items-center gap-2 rounded-2xl border p-3.5 text-center transition ${
+                        theme === "light"
+                          ? "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-xs"
+                          : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >
+                      <Sun size={20} className={theme === "light" ? "text-emerald-600" : "text-slate-400"} />
+                      <span className="text-xs font-semibold">Light</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTheme("dark");
+                        setPreferencesSaved(true);
+                      }}
+                      className={`flex flex-col items-center gap-2 rounded-2xl border p-3.5 text-center transition ${
+                        theme === "dark"
+                          ? "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-xs"
+                          : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >
+                      <Moon size={20} className={theme === "dark" ? "text-emerald-600" : "text-slate-400"} />
+                      <span className="text-xs font-semibold">Dark</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTheme("system");
+                        setPreferencesSaved(true);
+                      }}
+                      className={`flex flex-col items-center gap-2 rounded-2xl border p-3.5 text-center transition ${
+                        theme === "system"
+                          ? "border-emerald-500 bg-emerald-50 text-emerald-800 shadow-xs"
+                          : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >
+                      <Monitor size={20} className={theme === "system" ? "text-emerald-600" : "text-slate-400"} />
+                      <span className="text-xs font-semibold">System</span>
+                    </button>
+                  </div>
+                  <p className="mt-2 text-xs text-slate-400">
+                    Choose whether Sweety follows your system preference or stays in Light/Dark mode.
+                  </p>
+                </div>
               </div>
             </section>
 

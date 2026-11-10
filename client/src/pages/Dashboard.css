@@ -1,0 +1,380 @@
+/* Sweety - Clinical Intelligence Theme (Dashboard Scoped) */
+
+:root {
+  --sweety-forest-primary: #174C3A;
+  --sweety-forest-deep: #103528;
+  --sweety-forest-accent: #2D805B;
+  --sweety-forest-bg: #F3F6F1;
+  --sweety-forest-card: #FFFFFF;
+  --sweety-forest-text-main: #183D30;
+  --sweety-forest-text-muted: #718078;
+  --sweety-forest-border: #E3EAE3;
+}
+
+html.dark,
+:root.dark,
+.dark,
+[data-theme="dark"] {
+  --sweety-forest-primary: #2D805B;
+  --sweety-forest-deep: #0B1612;
+  --sweety-forest-accent: #34A873;
+  --sweety-forest-bg: #0B1612;
+  --sweety-forest-card: #12241D;
+  --sweety-forest-text-main: #F0F6F2;
+  --sweety-forest-text-muted: #8AA89B;
+  --sweety-forest-border: #1E3E32;
+}
+
+.sweety-dashboard-wrapper {
+  background-color: #F3F6F1;
+  color: #183D30;
+  min-height: 100vh;
+}
+
+.dark .sweety-dashboard-wrapper,
+[data-theme="dark"] .sweety-dashboard-wrapper {
+  background-color: #0B1612;
+  color: #F0F6F2;
+}
+
+/* Clinical Card */
+.clinical-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E3EAE3;
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 3px 0 rgba(16, 53, 40, 0.03), 0 1px 2px -1px rgba(16, 53, 40, 0.03);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.24s ease;
+  will-change: transform, box-shadow;
+}
+
+.clinical-card-hover:hover {
+  box-shadow: 0 10px 24px -4px rgba(23, 76, 58, 0.08);
+  border-color: #D2DFD2;
+  transform: translateY(-3px);
+}
+
+.dark .clinical-card,
+[data-theme="dark"] .clinical-card {
+  background-color: #12241D;
+  border-color: #1E3E32;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.dark .clinical-card-hover:hover,
+[data-theme="dark"] .clinical-card-hover:hover {
+  box-shadow: 0 10px 28px -4px rgba(0, 0, 0, 0.55);
+  border-color: #2D5846;
+}
+
+/* Clinical Hero Banner */
+.clinical-hero-banner {
+  background: linear-gradient(135deg, #103528 0%, #174C3A 60%, #1d5843 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.clinical-hero-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  background: radial-gradient(circle at 80% 20%, rgba(45, 128, 91, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Primary Forest Button */
+.btn-primary-forest {
+  background-color: #174C3A;
+  color: #FFFFFF;
+  border: 1px solid #103528;
+  transition: background-color 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
+}
+
+.btn-primary-forest:hover {
+  background-color: #103528;
+  box-shadow: 0 4px 12px rgba(16, 53, 40, 0.18);
+  transform: translateY(-1px);
+}
+
+.btn-primary-forest:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 6px rgba(16, 53, 40, 0.12);
+}
+
+.dark .btn-primary-forest,
+[data-theme="dark"] .btn-primary-forest {
+  background-color: #2D805B;
+  border-color: #34A873;
+}
+
+.dark .btn-primary-forest:hover,
+[data-theme="dark"] .btn-primary-forest:hover {
+  background-color: #23684A;
+}
+
+/* Secondary Button */
+.btn-secondary-clinical {
+  background-color: #FFFFFF;
+  color: #183D30;
+  border: 1px solid #E3EAE3;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
+}
+
+.btn-secondary-clinical:hover {
+  background-color: #F8FAF8;
+  border-color: #D3DFD3;
+  transform: translateY(-1px);
+}
+
+.btn-secondary-clinical:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.dark .btn-secondary-clinical,
+[data-theme="dark"] .btn-secondary-clinical {
+  background-color: #162E25;
+  color: #F0F6F2;
+  border-color: #1E3E32;
+}
+
+.dark .btn-secondary-clinical:hover,
+[data-theme="dark"] .btn-secondary-clinical:hover {
+  background-color: #1A372C;
+  border-color: #2D5846;
+  color: #FFFFFF;
+}
+
+/* Clinical Status Badges */
+.badge-in-target {
+  background-color: #EBF5F0;
+  color: #174C3A;
+  border: 1px solid #D1E7DC;
+}
+
+.badge-elevated {
+  background-color: #FEF7EE;
+  color: #92400E;
+  border: 1px solid #FDE6C8;
+}
+
+.badge-high {
+  background-color: #FEF2F2;
+  color: #991B1B;
+  border: 1px solid #FEE2E2;
+}
+
+.badge-low {
+  background-color: #F0F7FD;
+  color: #0369A1;
+  border: 1px solid #BAE6FD;
+}
+
+.dark .badge-in-target,
+[data-theme="dark"] .badge-in-target {
+  background-color: rgba(45, 128, 91, 0.22);
+  color: #4ADE80;
+  border-color: rgba(45, 128, 91, 0.35);
+}
+
+.dark .badge-elevated,
+[data-theme="dark"] .badge-elevated {
+  background-color: rgba(217, 119, 6, 0.22);
+  color: #FBBF24;
+  border-color: rgba(217, 119, 6, 0.35);
+}
+
+.dark .badge-high,
+[data-theme="dark"] .badge-high {
+  background-color: rgba(220, 38, 38, 0.22);
+  color: #F87171;
+  border-color: rgba(220, 38, 38, 0.35);
+}
+
+.dark .badge-low,
+[data-theme="dark"] .badge-low {
+  background-color: rgba(2, 132, 199, 0.22);
+  color: #60A5FA;
+  border-color: rgba(2, 132, 199, 0.35);
+}
+
+/* ======================================================== */
+/* PROFESSIONAL SUBTLE ANIMATIONS                           */
+/* ======================================================== */
+
+/* Section Entrance Animation */
+@keyframes dashboardFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: dashboardFadeInUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Navigation Links */
+.nav-item-transition {
+  transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s ease;
+}
+
+.nav-item-transition:hover {
+  transform: translateX(2px);
+}
+
+.nav-item-transition:active {
+  transform: translateX(1px) scale(0.99);
+}
+
+/* Chart Line Drawing Animation */
+@keyframes drawTrendLine {
+  from {
+    stroke-dashoffset: 1200;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.chart-line-animate {
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+  animation: drawTrendLine 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Chart Area Fill Fade-In */
+@keyframes fadeInTrendArea {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.chart-area-animate {
+  animation: fadeInTrendArea 0.7s ease-out 0.2s both;
+}
+
+/* Chart Data Point Node Animation */
+@keyframes popTrendPoint {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.chart-point-node {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: popTrendPoint 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Tooltip Gentle Fade-In */
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.chart-tooltip-box {
+  background: #103528;
+  color: #FFFFFF;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+  font-size: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  pointer-events: none;
+  animation: tooltipFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.dark .chart-tooltip-box,
+[data-theme="dark"] .chart-tooltip-box {
+  background: #0B1612;
+  color: #F0F6F2;
+  border: 1px solid #1E3E32;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* Modal Transitions */
+@keyframes modalBackdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-backdrop-animate {
+  animation: modalBackdropFadeIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalCardEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-card-animate {
+  animation: modalCardEnter 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Button Active / Press Utility */
+.btn-press-animate {
+  transition: transform 0.12s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.btn-press-animate:active {
+  transform: scale(0.98);
+}
+
+/* Accessibility: Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+  }
+
+  .chart-line-animate {
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+
+  .clinical-card-hover:hover,
+  .btn-primary-forest:hover,
+  .btn-secondary-clinical:hover,
+  .nav-item-transition:hover {
+    transform: none !important;
+  }
+}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ThemeToggle from '../components/ThemeToggle';
 import {
   Heart,
   User,
@@ -144,7 +145,10 @@ export default function Signup() {
     formData.password === formData.confirmPassword;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f6faf8] px-4 py-12 sm:px-6 lg:px-8">
+    <div className="relative flex min-h-screen items-center justify-center bg-[#f6faf8] px-4 py-12 sm:px-6 lg:px-8">
+      <div className="absolute top-5 right-5">
+        <ThemeToggle className="rounded-xl border border-slate-100 bg-white p-2.5 text-slate-500 shadow-xs hover:bg-slate-50" />
+      </div>
       <div className="w-full max-w-md">
         {/* Brand Header */}
         <div className="mb-8 flex flex-col items-center text-center">

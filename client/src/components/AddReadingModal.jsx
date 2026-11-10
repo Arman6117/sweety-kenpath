@@ -145,12 +145,12 @@ function AddReadingModalDialog({ onClose, onSave }) {
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity modal-backdrop-animate"
         onClick={!isSubmitting ? onClose : undefined}
       />
 
       {/* Modal Dialog Card */}
-      <div className="relative w-full max-w-lg rounded-3xl border border-slate-100 bg-white p-6 shadow-2xl sm:p-8">
+      <div className="relative w-full max-w-lg rounded-3xl border border-slate-100 bg-white p-6 shadow-2xl sm:p-8 modal-card-animate">
         {/* Header */}
         <div className="mb-6 flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -218,11 +218,10 @@ function AddReadingModalDialog({ onClose, onSave }) {
                 value={formData.date}
                 onChange={handleChange}
                 disabled={isSubmitting || Boolean(successMessage)}
-                className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 text-sm text-slate-800 transition focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-slate-50 ${
-                  errors.date
+                className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 text-sm text-slate-800 transition focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-slate-50 ${errors.date
                     ? 'border-red-300 focus:border-red-500'
                     : 'border-slate-200 focus:border-emerald-500'
-                }`}
+                  }`}
               />
             </div>
             {errors.date && (
@@ -251,11 +250,10 @@ function AddReadingModalDialog({ onClose, onSave }) {
                 value={formData.slot}
                 onChange={handleChange}
                 disabled={isSubmitting || Boolean(successMessage)}
-                className={`w-full appearance-none rounded-xl border bg-white py-3 pl-11 pr-10 text-sm text-slate-800 transition focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-slate-50 ${
-                  errors.slot
+                className={`w-full appearance-none rounded-xl border bg-white py-3 pl-11 pr-10 text-sm text-slate-800 transition focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-slate-50 ${errors.slot
                     ? 'border-red-300 focus:border-red-500'
                     : 'border-slate-200 focus:border-emerald-500'
-                }`}
+                  }`}
               >
                 {SLOT_OPTIONS.map((slot) => (
                   <option key={slot.value} value={slot.value}>
@@ -298,11 +296,10 @@ function AddReadingModalDialog({ onClose, onSave }) {
                 value={formData.value}
                 onChange={handleChange}
                 disabled={isSubmitting || Boolean(successMessage)}
-                className={`w-full rounded-xl border bg-white py-3 pl-11 pr-20 text-sm text-slate-800 transition focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-slate-50 ${
-                  errors.value
+                className={`w-full rounded-xl border bg-white py-3 pl-11 pr-20 text-sm text-slate-800 transition focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-slate-50 ${errors.value
                     ? 'border-red-300 focus:border-red-500'
                     : 'border-slate-200 focus:border-emerald-500'
-                }`}
+                  }`}
               />
               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-xs font-semibold text-slate-400">
                 mg/dL

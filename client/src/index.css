@@ -1,4 +1,3 @@
-
 @import "tailwindcss";
 
 /*
@@ -8,7 +7,7 @@
   source files. We use @source inline(...) to explicitly list every utility
   class used in the project so Tailwind generates them.
 */
-@source inline("absolute animate-pulse animate-spin appearance-none backdrop-blur-sm bg-[#f6faf8] bg-blue-50 bg-emerald-100 bg-emerald-50 bg-emerald-50/50 bg-emerald-500 bg-emerald-600 bg-gradient-to-r bg-orange-50 bg-purple-50 bg-red-50 bg-red-600 bg-slate-100 bg-slate-50 bg-slate-50/80 bg-slate-900/40 bg-white block border border-b border-emerald-100 border-emerald-200 border-r border-red-100 border-red-300 border-slate-100 border-slate-200 border-slate-200/60 border-slate-50 border-t cursor-not-allowed disabled:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:opacity-70 fixed flex flex-1 flex-col focus:border-emerald-500 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-bold font-medium font-semibold from-emerald-600 gap-1 gap-1.5 gap-2 gap-2.5 gap-3 gap-4 gap-5 grid grid-cols-1 h-10 h-11 h-12 h-14 h-16 h-9 hidden hover:-translate-y-1 hover:bg-emerald-100 hover:bg-emerald-50 hover:bg-emerald-700 hover:bg-red-100/50 hover:bg-red-50 hover:bg-red-700 hover:bg-slate-100 hover:bg-slate-50 hover:bg-slate-50/70 hover:opacity-95 hover:shadow-md hover:text-emerald-700 hover:text-emerald-800 hover:text-red-600 hover:text-slate-600 hover:text-slate-800 hover:text-slate-900 inline-flex inset-0 inset-y-0 items-baseline items-center items-start justify-between justify-center justify-end last:border-0 leading-5 leading-6 left-0 lg:col-span-1 lg:flex lg:flex-col lg:grid-cols-3 lg:hidden lg:px-10 lg:px-8 max-w-lg max-w-md max-w-sm mb-1.5 mb-12 mb-2 mb-3 mb-4 mb-5 mb-6 mb-8 mb-9 md:grid-cols-2 md:grid-cols-3 min-h-screen min-w-0 min-w-[560px] mt-0.5 mt-1 mt-1.5 mt-2 mt-3 mt-4 mt-5 mt-6 mt-7 mt-8 mt-auto mx-1.5 mx-auto overflow-x-auto p-1 p-1.5 p-2 p-3 p-3.5 p-4 p-5 p-6 p-7 pl-10 pl-11 pl-3.5 pl-4 placeholder-slate-400 pointer-events-none pr-10 pr-11 pr-20 pr-3.5 pr-4 pt-2 pt-3 pt-4 pt-5 pt-6 px-2 px-2.5 px-3 px-3.5 px-4 px-5 px-6 py-0.5 py-1 py-1.5 py-12 py-14 py-16 py-2 py-2.5 py-3 py-3.5 py-4 py-5 py-6 py-7 py-8 relative right-0 rotate-180 rounded-2xl rounded-3xl rounded-full rounded-lg rounded-md rounded-xl self-start shadow-2xl shadow-emerald-100 shadow-lg shadow-md shadow-sm shadow-xl shadow-xs shrink-0 sm:block sm:col-span-2 sm:flex-row sm:grid-cols-2 sm:items-center sm:p-5 sm:p-7 sm:p-8 sm:p-9 sm:px-6 sm:px-8 sm:text-2xl sm:text-3xl space-y-1.5 space-y-2 space-y-4 space-y-5 space-y-8 text-2xl text-3xl text-base text-blue-600 text-center text-emerald-50 text-emerald-600 text-emerald-700 text-emerald-800 text-left text-lg text-orange-600 text-purple-600 text-red-600 text-red-700 text-right text-slate-300 text-slate-400 text-slate-500 text-slate-600 text-slate-700 text-slate-800 text-slate-900 text-sm text-white text-xl text-xs to-teal-500 tracking-tight tracking-wider transition transition-opacity transition-transform truncate uppercase w-10 w-11 w-12 w-14 w-16 w-64 w-72 w-9 w-full xl:grid-cols-4 z-20 z-30 z-50");
+@source inline("absolute animate-fade-in-up animate-pulse animate-spin antialiased appearance-none backdrop-blur-sm backdrop-blur-xs bg-[#0A2219] bg-[#0A2219]/60 bg-[#0F2E22] bg-[#103528]/40 bg-[#174C3A] bg-[#184532] bg-[#1E6B47] bg-[#2D805B] bg-[#68B18C] bg-[#B2D6C3] bg-[#E7F6F4] bg-[#EBF5ED] bg-[#EBF5F0] bg-[#EFEBF8] bg-[#F8FAF8] bg-[#FAFCFA] bg-[#FDEEE9] bg-[#f6faf8] bg-blue-50 bg-emerald-100 bg-emerald-50 bg-emerald-50/50 bg-emerald-500 bg-emerald-600 bg-gradient-to-r bg-orange-50 bg-purple-50 bg-red-50 bg-red-600 bg-slate-100 bg-slate-50 bg-slate-50/80 bg-slate-900/40 bg-white bg-white/10 bg-white/20 bg-white/5 block border border-[#E3EAE3] border-[#E3EAE3]/60 border-b border-dashed border-emerald-100 border-emerald-200 border-r border-red-100 border-red-200 border-red-300 border-slate-100 border-slate-200 border-slate-200/60 border-slate-50 border-t border-white/10 botanical-bg-accent btn-press-animate btn-primary-forest btn-record-reading btn-secondary-clinical chart-area-animate chart-line-animate chart-point-node chart-tooltip-box clinical-card clinical-card-hover clinical-hero-banner cursor-not-allowed cursor-pointer disabled:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:opacity-70 donut-circle-meter filter-toggle-container fixed flex flex-1 flex-col flex-wrap focus:border-emerald-500 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-bold font-extrabold font-medium font-normal font-sans font-semibold from-emerald-600 gap-1 gap-1.5 gap-2 gap-2.5 gap-3 gap-3.5 gap-4 gap-5 gap-6 glossy-droplet-badge grid grid-cols-1 h-1.5 h-10 h-11 h-12 h-14 h-16 h-2 h-7 h-8 h-9 h-auto hidden hover:-translate-y-1 hover:bg-[#F3F6F1] hover:bg-[#F8FAF8] hover:bg-[#F9FAF8] hover:bg-emerald-100 hover:bg-emerald-50 hover:bg-emerald-700 hover:bg-red-100 hover:bg-red-100/50 hover:bg-red-50 hover:bg-red-700 hover:bg-slate-100 hover:bg-slate-50 hover:bg-slate-50/70 hover:bg-white/10 hover:opacity-95 hover:shadow-md hover:text-[#0F2E22] hover:text-[#103528] hover:text-[#183D30] hover:text-emerald-700 hover:text-emerald-800 hover:text-red-600 hover:text-red-700 hover:text-slate-600 hover:text-slate-800 hover:text-slate-900 hover:text-white inline-flex inset-0 inset-y-0 items-baseline items-center items-end items-start justify-between justify-center justify-end last:border-0 latest-reading-card latest-reading-waves leading-5 leading-6 leading-none leading-relaxed leading-tight left-0 lg:col-span-1 lg:col-span-4 lg:col-span-8 lg:flex lg:flex-col lg:grid-cols-12 lg:grid-cols-3 lg:hidden lg:px-10 lg:px-8 lg:px-9 max-w-2xl max-w-lg max-w-md max-w-sm mb-1.5 mb-12 mb-2 mb-3 mb-4 mb-5 mb-6 mb-7 mb-8 mb-9 md:grid-cols-2 md:grid-cols-3 min-h-screen min-w-0 min-w-[520px] min-w-[540px] min-w-[560px] min-w-[580px] modal-backdrop-animate modal-card-animate mt-0.5 mt-1 mt-1.5 mt-2 mt-2.5 mt-3 mt-4 mt-5 mt-6 mt-7 mt-8 mt-auto mx-1.5 mx-auto nav-item-transition overflow-x-auto p-1 p-1.5 p-2 p-2.5 p-3 p-3.5 p-4 p-5 p-6 p-7 pb-1 pb-2 pl-10 pl-11 pl-3.5 pl-4 placeholder-slate-400 pointer-events-none pr-10 pr-11 pr-20 pr-3 pr-3.5 pr-4 pt-1 pt-2 pt-2.5 pt-3 pt-4 pt-5 pt-6 px-1.5 px-2 px-2.5 px-3 px-3.5 px-4 px-5 px-6 py-0.5 py-1 py-1.5 py-12 py-14 py-16 py-2 py-2.5 py-20 py-3 py-3.5 py-4 py-5 py-6 py-7 py-8 recent-reading-item relative right-0 right-2 rotate-180 rounded-2xl rounded-3xl rounded-full rounded-lg rounded-md rounded-xl select-none self-start shadow-2xl shadow-emerald-100 shadow-inner shadow-lg shadow-md shadow-sm shadow-xl shadow-xs shrink-0 sm:block sm:col-span-2 sm:flex sm:flex-row sm:gap-3 sm:grid-cols-2 sm:inline sm:inline-flex sm:items-center sm:p-5 sm:p-6 sm:p-7 sm:p-8 sm:p-9 sm:px-6 sm:px-8 sm:self-auto sm:text-2xl sm:text-3xl sm:text-lg sm:text-sm space-y-1.5 space-y-2 space-y-3 space-y-4 space-y-5 space-y-8 summary-card-base summary-card-coral summary-card-green summary-card-purple summary-card-teal sweety-dashboard-wrapper sweety-sidebar sweety-sidebar-waves text-2xl text-3xl text-4xl text-[#103528] text-[#112F24] text-[#112F24]/80 text-[#174C3A] text-[#183D30] text-[#1E6B47] text-[#219183] text-[#2D805B] text-[#4FA57F] text-[#6B7F74] text-[#6D59A8] text-[#718078] text-[#8AA497] text-[#E05D44] text-[10px] text-[11px] text-base text-blue-600 text-center text-emerald-50 text-emerald-600 text-emerald-700 text-emerald-800 text-left text-lg text-orange-600 text-purple-600 text-red-600 text-red-700 text-red-800 text-right text-slate-300 text-slate-400 text-slate-500 text-slate-600 text-slate-700 text-slate-800 text-slate-900 text-sm text-white text-white/70 text-white/80 text-white/90 text-xl text-xs to-teal-500 top-2 tracking-tight tracking-wider transition transition-all transition-opacity transition-transform trend-card-container truncate uppercase w-1.5 w-10 w-11 w-12 w-14 w-16 w-2 w-60 w-64 w-7 w-72 w-8 w-9 w-full weekly-bar-fill weekly-bar-track xl:grid-cols-4 z-10 z-20 z-30 z-40 z-50");
 
 * {
   box-sizing: border-box;
@@ -19,4 +18,218 @@ body {
   min-width: 320px;
   min-height: 100vh;
   font-family: Inter, system-ui, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ======================================================== */
+/* CLINICAL INTELLIGENCE: COMPREHENSIVE DARK MODE THEME     */
+/* Consistent Dark Green / Charcoal Medical Palette         */
+/* ======================================================== */
+
+html.dark,
+body.dark,
+[data-theme="dark"] {
+  background-color: #0B1612 !important;
+  color: #F0F6F2 !important;
+  color-scheme: dark;
+}
+
+/* Backgrounds across all pages */
+.dark .bg-\[\#f6faf8\],
+.dark .bg-\[\#F3F6F1\],
+.dark .bg-\[\#F8FAF8\],
+.dark .bg-\[\#FAFCFA\],
+.dark .sweety-dashboard-wrapper,
+[data-theme="dark"] .bg-\[\#f6faf8\],
+[data-theme="dark"] .bg-\[\#F3F6F1\],
+[data-theme="dark"] .bg-\[\#F8FAF8\],
+[data-theme="dark"] .bg-\[\#FAFCFA\],
+[data-theme="dark"] .sweety-dashboard-wrapper {
+  background-color: #0B1612 !important;
+}
+
+/* White card surfaces, panels, sidebars */
+.dark .bg-white,
+[data-theme="dark"] .bg-white,
+.dark aside.bg-white,
+.dark .clinical-card {
+  background-color: #12241D !important;
+}
+
+/* Secondary elevated surfaces & inner cards */
+.dark .bg-slate-50,
+.dark .bg-slate-50\/80,
+.dark .bg-slate-50\/70,
+.dark .bg-slate-50\/60,
+.dark .bg-slate-50\/50,
+.dark .bg-slate-100,
+[data-theme="dark"] .bg-slate-50,
+[data-theme="dark"] .bg-slate-50\/80,
+[data-theme="dark"] .bg-slate-50\/70,
+[data-theme="dark"] .bg-slate-100 {
+  background-color: #162E25 !important;
+}
+
+/* Border hierarchy */
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-200\/60,
+.dark .border-\[\#E3EAE3\],
+.dark .border-\[\#E3EAE3\]\/60,
+[data-theme="dark"] .border-slate-100,
+[data-theme="dark"] .border-slate-200,
+[data-theme="dark"] .border-\[\#E3EAE3\] {
+  border-color: #1E3E32 !important;
+}
+
+/* Primary heading & value text */
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-\[\#183D30\],
+.dark .text-\[\#103528\],
+.dark .text-\[\#112F24\],
+[data-theme="dark"] .text-slate-900,
+[data-theme="dark"] .text-slate-800,
+[data-theme="dark"] .text-\[\#183D30\] {
+  color: #F0F6F2 !important;
+}
+
+/* Secondary labels & slot text */
+.dark .text-slate-700,
+.dark .text-slate-600,
+[data-theme="dark"] .text-slate-700,
+[data-theme="dark"] .text-slate-600 {
+  color: #C6D8CE !important;
+}
+
+/* Muted secondary helper text */
+.dark .text-slate-500,
+.dark .text-slate-400,
+.dark .text-\[\#718078\],
+.dark .text-\[\#6B7F74\],
+.dark .text-\[\#8AA497\],
+[data-theme="dark"] .text-slate-500,
+[data-theme="dark"] .text-slate-400,
+[data-theme="dark"] .text-\[\#718078\] {
+  color: #8AA89B !important;
+}
+
+/* Form Controls & Inputs */
+.dark input,
+.dark select,
+.dark textarea,
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: #0E1C16 !important;
+  color: #F0F6F2 !important;
+  border-color: #1E3E32 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #5E7A6E !important;
+}
+
+.dark input:disabled,
+.dark input[readonly],
+.dark select:disabled {
+  background-color: #14281F !important;
+  color: #8AA89B !important;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  border-color: #34A873 !important;
+  box-shadow: 0 0 0 2px rgba(52, 168, 115, 0.25) !important;
+}
+
+/* Tables (Reading History) */
+.dark table th {
+  background-color: #162E25 !important;
+  color: #C6D8CE !important;
+  border-color: #1E3E32 !important;
+}
+
+.dark table td {
+  border-color: #1E3E32 !important;
+}
+
+.dark tr:hover td {
+  background-color: #183327 !important;
+}
+
+/* Hover States across elements */
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-100:hover,
+.dark .hover\:bg-\[\#F3F6F1\]:hover,
+.dark .hover\:bg-\[\#F8FAF8\]:hover,
+.dark .hover\:bg-\[\#F9FAF8\]:hover,
+[data-theme="dark"] .hover\:bg-slate-50:hover {
+  background-color: #183327 !important;
+}
+
+.dark .hover\:text-slate-800:hover,
+.dark .hover\:text-slate-900:hover,
+.dark .hover\:text-\[\#183D30\]:hover {
+  color: #FFFFFF !important;
+}
+
+/* Emerald Accents, Pills & Active States */
+.dark .bg-emerald-50,
+.dark .bg-emerald-50\/50,
+.dark .bg-\[\#EBF5F0\],
+.dark .bg-\[\#EBF5ED\],
+.dark .bg-\[\#E7F6F4\],
+[data-theme="dark"] .bg-emerald-50,
+[data-theme="dark"] .bg-\[\#EBF5F0\] {
+  background-color: rgba(45, 128, 91, 0.22) !important;
+  color: #4ADE80 !important;
+}
+
+.dark .bg-emerald-100 {
+  background-color: rgba(45, 128, 91, 0.35) !important;
+}
+
+.dark .text-emerald-700,
+.dark .text-emerald-600,
+.dark .text-emerald-800,
+.dark .text-\[\#174C3A\],
+.dark .text-\[\#1E6B47\],
+.dark .text-\[\#2D805B\],
+.dark .text-\[\#4FA57F\] {
+  color: #4ADE80 !important;
+}
+
+.dark .border-emerald-100,
+.dark .border-emerald-200 {
+  border-color: rgba(45, 128, 91, 0.35) !important;
+}
+
+/* Red / Danger Alerts */
+.dark .bg-red-50 {
+  background-color: rgba(220, 38, 38, 0.2) !important;
+  border-color: rgba(220, 38, 38, 0.35) !important;
+  color: #F87171 !important;
+}
+
+.dark .border-red-100,
+.dark .border-red-200,
+.dark .border-red-300 {
+  border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+/* Modal Backdrops & Overlays */
+.dark .bg-slate-900\/40,
+.dark .bg-\[\#103528\]\/40 {
+  background-color: rgba(5, 12, 9, 0.82) !important;
+}
+
+/* Elevated Shadows */
+.dark .shadow-sm,
+.dark .shadow-md,
+.dark .shadow-xl,
+.dark .shadow-2xl {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55) !important;
 }

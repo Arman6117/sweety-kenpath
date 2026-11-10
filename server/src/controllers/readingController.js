@@ -1,3 +1,4 @@
+
 const prisma = require("../config/prisma");
 
 // Allowed glucose reading slots
@@ -7,6 +8,16 @@ const ALLOWED_SLOTS = [
   "AFTER_LUNCH",
   "AFTER_DINNER"
 ];
+
+// Convert slot name into a readable label
+const getSlotLabel = (slot) => {
+  return slot.toLowerCase().replaceAll("_", " ");
+};
+
+// Generate duplicate reading error message
+const getDuplicateMessage = (slot) => {
+  return `You already have an ${getSlotLabel(slot)} reading for this date.`;
+};
 
 // Validate date in YYYY-MM-DD format.
 // Use India local date for the no-future-date rule.
@@ -41,14 +52,34 @@ const validateReadingDate = (dateString) => {
   return date;
 };
 
-// Validate the reading fields
+// Validate glucose reading fields
 const validateReading = ({ date, slot, value }) => {
-  if (!date || !slot || value === undefined || value === null) {
-    return "Date, slot and glucose value are required.";
+  if (!date || !slot) {
+    return "Date and slot are required.";
   }
 
-  if (!validateReadingDate(date)) {
-    return "Please provide a valid date that is not in the future.";
+  if (value === undefined || value === null || value === "") {
+    return "Please enter a glucose value.";
+  }
+
+  const readingDate = validateReadingDate(date);
+
+  if (!readingDate) {
+    if (
+      typeof date === "string" &&
+      /^\d{4}-\d{2}-\d{2}$/.test(date)
+    ) {
+      const parsedDate = new Date(`${date}T00:00:00.000Z`);
+
+      if (
+        !Number.isNaN(parsedDate.getTime()) &&
+        parsedDate.toISOString().slice(0, 10) === date
+      ) {
+        return "Date cannot be in the future.";
+      }
+    }
+
+    return "Please provide a valid date.";
   }
 
   if (!ALLOWED_SLOTS.includes(slot)) {
@@ -56,7 +87,7 @@ const validateReading = ({ date, slot, value }) => {
   }
 
   if (!Number.isInteger(value) || value < 40 || value > 600) {
-    return "Glucose value must be a whole number between 40 and 600 mg/dL.";
+    return "Value must be between 40 and 600 mg/dl.";
   }
 
   return null;
@@ -90,7 +121,7 @@ const createReading = async (req, res) => {
     if (dailyCount >= 4) {
       return res.status(400).json({
         success: false,
-        message: "You can add a maximum of four readings per day."
+        message: "You can add only 4 readings per day."
       });
     }
 
@@ -108,7 +139,7 @@ const createReading = async (req, res) => {
     if (existingReading) {
       return res.status(409).json({
         success: false,
-        message: "A reading already exists for this slot on this date."
+        message: getDuplicateMessage(slot)
       });
     }
 
@@ -130,11 +161,11 @@ const createReading = async (req, res) => {
   } catch (error) {
     console.error("Create reading error:", error);
 
-    // Handles duplicate requests that reach the database simultaneously
+    // Handle simultaneous duplicate requests
     if (error.code === "P2002") {
       return res.status(409).json({
         success: false,
-        message: "A reading already exists for this slot on this date."
+        message: getDuplicateMessage(req.body.slot)
       });
     }
 
@@ -241,6 +272,22 @@ const updateReading = async (req, res) => {
       });
     }
 
+    // Check daily limit, excluding the reading being updated
+    const dailyCount = await prisma.reading.count({
+      where: {
+        userId,
+        date: readingDate,
+        NOT: { id }
+      }
+    });
+
+    if (dailyCount >= 4) {
+      return res.status(400).json({
+        success: false,
+        message: "You can add only 4 readings per day."
+      });
+    }
+
     // Check for another reading occupying the requested slot
     const duplicate = await prisma.reading.findFirst({
       where: {
@@ -254,7 +301,7 @@ const updateReading = async (req, res) => {
     if (duplicate) {
       return res.status(409).json({
         success: false,
-        message: "A reading already exists for this slot on this date."
+        message: getDuplicateMessage(slot)
       });
     }
 
@@ -279,7 +326,7 @@ const updateReading = async (req, res) => {
     if (error.code === "P2002") {
       return res.status(409).json({
         success: false,
-        message: "A reading already exists for this slot on this date."
+        message: getDuplicateMessage(req.body.slot)
       });
     }
 
@@ -334,5 +381,10 @@ module.exports = {
   getReadings,
   getReadingById,
   updateReading,
-  deleteReading
+  deleteReading,
+  validateReading,
+  validateReadingDate,
+  ALLOWED_SLOTS,
+  getSlotLabel,
+  getDuplicateMessage
 };
