@@ -1,0 +1,153 @@
+/* Auth Split-Screen Styles (Login & Signup) - Official Forest-Green Clinical Identity */
+
+.auth-split-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #F4F7F2;
+  color: #193D32;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dark .auth-split-wrapper {
+  background-color: #0B1612;
+  color: #F0F6F2;
+}
+
+@media (min-width: 1024px) {
+  .auth-split-wrapper {
+    flex-direction: row;
+  }
+}
+
+/* Left Branded Hero Column */
+.auth-hero-column {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2.5rem 1.5rem;
+  background: linear-gradient(145deg, #103528 0%, #174F3D 55%, #1E6B47 100%);
+  color: #FFFFFF;
+}
+
+@media (min-width: 640px) {
+  .auth-hero-column {
+    padding: 3rem 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .auth-hero-column {
+    width: 48%;
+    min-height: 100vh;
+    padding: 4rem 3.5rem;
+  }
+}
+
+.dark .auth-hero-column {
+  background: linear-gradient(145deg, #071510 0%, #0D241C 55%, #143529 100%);
+  border-right: 1px solid rgba(40, 118, 93, 0.25);
+}
+
+/* Ambient glow blobs */
+.auth-glow-orb {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  filter: blur(64px);
+}
+
+/* Right Form Column */
+.auth-form-column {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2.5rem 1.25rem;
+  min-height: 100%;
+}
+
+@media (min-width: 640px) {
+  .auth-form-column {
+    padding: 3.5rem 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .auth-form-column {
+    padding: 4rem;
+  }
+}
+
+.auth-form-container {
+  width: 100%;
+  max-width: 440px;
+}
+
+/* Form Card Surface */
+.auth-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E0E9E2;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 10px 25px -5px rgba(23, 79, 61, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .auth-card {
+    padding: 2.5rem;
+  }
+}
+
+.dark .auth-card {
+  background-color: #12241D;
+  border-color: #1E3E32;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* Auth Input Fields */
+.auth-input {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #E0E9E2;
+  background-color: #FFFFFF;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  font-size: 0.875rem;
+  color: #193D32;
+  transition: all 0.2s ease;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: #174F3D;
+  box-shadow: 0 0 0 3px rgba(23, 79, 61, 0.15);
+}
+
+.auth-input.has-error {
+  border-color: #EF4444;
+}
+
+.auth-input.has-error:focus {
+  border-color: #EF4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.dark .auth-input {
+  background-color: #162E25;
+  border-color: #1E3E32;
+  color: #F0F6F2;
+}
+
+.dark .auth-input:focus {
+  border-color: #2D805B;
+  box-shadow: 0 0 0 3px rgba(45, 128, 91, 0.25);
+}
+
+.dark .auth-input::placeholder {
+  color: #8AA497;
+}

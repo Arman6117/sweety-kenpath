@@ -135,7 +135,7 @@ export default function ProfileDropdown({ className = "" }) {
                   type="button"
                   onClick={() => {
                     handleClose();
-                    navigate("/");
+                    navigate("/dashboard");
                   }}
                   className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-semibold text-slate-700 dark:text-[#C2D6CD] transition hover:bg-slate-50 dark:hover:bg-[#162C22] hover:text-slate-900 dark:hover:text-[#F1F7F4]"
                 >

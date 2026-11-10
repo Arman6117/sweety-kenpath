@@ -5,6 +5,7 @@ import { useTheme } from "../context/ThemeContext";
 import ThemeToggle from "../components/ThemeToggle";
 import ProfileDropdown from "../components/ProfileDropdown";
 import NotificationPopover from "../components/NotificationPopover";
+import Logo from "../components/Logo";
 import api from "../api/axios";
 import AddReadingModal from "../components/AddReadingModal";
 import "./Dashboard.css";
@@ -33,7 +34,7 @@ import {
 } from "lucide-react";
 
 const navigation = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/", active: true },
+  { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard", active: true },
   { label: "Add Reading", icon: Droplets, isAction: true },
   { label: "Reading History", icon: ClipboardList, path: "/history" },
   { label: "Reports", icon: BarChart3, path: "/reports" },
@@ -423,23 +424,8 @@ export default function Dashboard() {
         {/* ======================================================== */}
         <aside className="hidden w-64 shrink-0 border-r border-[#E3EAE3] bg-white px-5 py-7 lg:flex lg:flex-col">
           {/* Brand Header */}
-          <div className="mb-9 flex items-center gap-3 px-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#174C3A] text-white shadow-xs">
-              <Activity size={22} strokeWidth={2.2} />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xl font-bold tracking-tight text-[#183D30]">
-                  Sweety
-                </span>
-                <span className="rounded-md bg-[#EBF5F0] px-1.5 py-0.5 text-[10px] font-bold text-[#174C3A] uppercase tracking-wider">
-                  Care
-                </span>
-              </div>
-              <p className="text-[11px] font-medium text-[#718078]">
-                Clinical Intelligence
-              </p>
-            </div>
+          <div className="mb-9 px-2">
+            <Logo size="medium" showSubtitle={true} subtitle="Clinical Intelligence" />
           </div>
 
           <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#718078]">
@@ -518,14 +504,7 @@ export default function Dashboard() {
             />
             <div className="relative flex w-72 flex-col bg-white p-6 shadow-xl">
               <div className="mb-6 flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#174C3A] text-white">
-                    <Activity size={20} />
-                  </div>
-                  <span className="text-lg font-bold tracking-tight text-[#183D30]">
-                    Sweety
-                  </span>
-                </div>
+                <Logo size="compact" showSubtitle={false} />
                 <button
                   onClick={() => setMobileMenuOpen(false)}
                   className="rounded-lg p-1.5 text-[#718078] hover:bg-[#F3F6F1]"
