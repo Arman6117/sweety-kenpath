@@ -1,0 +1,164 @@
+/* Sweety - Official Forest-Green Clinical Healthcare SaaS Landing Styles */
+
+:root {
+  --landing-primary: #174F3D;
+  --landing-primary-hover: #21634D;
+  --landing-secondary: #28765D;
+  --landing-mint-light: #EAF3ED;
+  --landing-bg-page: #F4F7F2;
+  --landing-surface: #FFFFFF;
+  --landing-text-main: #193D32;
+  --landing-text-muted: #788A80;
+  --landing-border: #E0E9E2;
+}
+
+.dark {
+  --landing-primary: #2D805B;
+  --landing-primary-hover: #3AA375;
+  --landing-secondary: #68B18C;
+  --landing-mint-light: #162E25;
+  --landing-bg-page: #0B1612;
+  --landing-surface: #12241D;
+  --landing-text-main: #F0F6F2;
+  --landing-text-muted: #8AA497;
+  --landing-border: #1E3E32;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hero Floating Illustration Animation */
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(0.5deg);
+  }
+}
+
+.animate-float-gentle {
+  animation: floatGentle 5s ease-in-out infinite;
+}
+
+/* Subtle Glow Orb Breathing */
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.05);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glowPulse 6s ease-in-out infinite;
+}
+
+/* Primary Forest-Green Gradient Buttons */
+.btn-forest-gradient {
+  background: linear-gradient(135deg, #174F3D 0%, #21634D 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(23, 79, 61, 0.28);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-forest-gradient:hover {
+  background: linear-gradient(135deg, #103528 0%, #174F3D 100%);
+  box-shadow: 0 6px 20px rgba(23, 79, 61, 0.38);
+  transform: translateY(-2px);
+}
+
+.btn-forest-gradient:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Secondary Clinical Outline Button */
+.btn-forest-outline {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #E0E9E2;
+  color: #174F3D;
+  transition: all 0.2s ease;
+}
+
+.btn-forest-outline:hover {
+  background-color: #EAF3ED;
+  border-color: #28765D;
+  color: #103528;
+  transform: translateY(-1px);
+}
+
+.dark .btn-forest-outline {
+  background-color: rgba(18, 36, 29, 0.85);
+  border: 1px solid #1E3E32;
+  color: #EAF3ED;
+}
+
+.dark .btn-forest-outline:hover {
+  background-color: #162E25;
+  border-color: #2D805B;
+  color: #FFFFFF;
+}
+
+/* Premium Card Hover Lift */
+.landing-card {
+  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.26s ease;
+}
+
+.landing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -8px rgba(23, 79, 61, 0.12);
+  border-color: #28765D;
+}
+
+.dark .landing-card:hover {
+  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.6);
+  border-color: #2D805B;
+}
+
+/* Glassmorphism Navigation Bar */
+.landing-glass-nav {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background-color: rgba(244, 247, 242, 0.88);
+  border-bottom: 1px solid rgba(224, 233, 226, 0.8);
+}
+
+.dark .landing-glass-nav {
+  background-color: rgba(11, 22, 18, 0.88);
+  border-bottom: 1px solid rgba(30, 62, 50, 0.7);
+}
+
+/* Wrapper and surfaces */
+.landing-wrapper {
+  background-color: #F4F7F2;
+  color: #193D32;
+}
+
+.dark .landing-wrapper {
+  background-color: #0B1612;
+  color: #F0F6F2;
+}
+
+.landing-section-alt {
+  background-color: #EAF3ED;
+}
+
+.dark .landing-section-alt {
+  background-color: #0E1D18;
+}
+
+.landing-card-surface {
+  background-color: #FFFFFF;
+  border-color: #E0E9E2;
+}
+
+.dark .landing-card-surface {
+  background-color: #12241D;
+  border-color: #1E3E32;
+}

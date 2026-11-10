@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
+import Logo from '../components/Logo';
+import HealthcareIllustration from '../components/HealthcareIllustration';
 import {
-  Heart,
   User,
   Mail,
   Lock,
@@ -12,8 +13,12 @@ import {
   AlertCircle,
   Loader2,
   ArrowRight,
+  ArrowLeft,
   CheckCircle2,
+  Sparkles,
 } from 'lucide-react';
+import './Landing.css';
+import './Auth.css';
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -34,7 +39,6 @@ export default function Signup() {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Clean up timer on unmount
   useEffect(() => {
     return () => {
       if (redirectTimerRef.current) {
@@ -47,7 +51,6 @@ export default function Signup() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Clear field-specific error as user types
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
@@ -102,8 +105,6 @@ export default function Signup() {
     setIsLoading(true);
 
     try {
-      // Reuses AuthContext register method which sends POST http://localhost:5000/api/auth/register
-      // with { name, email, password } and saves the token to localStorage ('sweety_token')
       const responseData = await register(
         formData.name,
         formData.email,
@@ -115,9 +116,8 @@ export default function Signup() {
         'Account created successfully! Redirecting to your dashboard...';
       setSuccessMessage(msg);
 
-      // Short delay so user sees the success feedback before redirecting to Dashboard
       redirectTimerRef.current = setTimeout(() => {
-        navigate('/', { replace: true });
+        navigate('/dashboard', { replace: true });
       }, 1000);
     } catch (err) {
       const status = err.response?.status;
@@ -127,7 +127,6 @@ export default function Signup() {
 
       setServerError(message);
 
-      // Specifically flag the email field if duplicate email error (HTTP 409)
       if (status === 409) {
         setErrors((prev) => ({
           ...prev,
@@ -145,291 +144,353 @@ export default function Signup() {
     formData.password === formData.confirmPassword;
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-[#f6faf8] px-4 py-12 sm:px-6 lg:px-8">
-      <div className="absolute top-5 right-5">
-        <ThemeToggle className="rounded-xl border border-slate-100 bg-white p-2.5 text-slate-500 shadow-xs hover:bg-slate-50" />
-      </div>
-      <div className="w-full max-w-md">
-        {/* Brand Header */}
-        <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-100">
-            <Heart size={30} fill="white" />
+    <div className="auth-split-wrapper">
+      {/* ======================================================== */}
+      {/* LEFT COLUMN: BRANDED HEALTHCARE HERO PANEL (Desktop)     */}
+      {/* ======================================================== */}
+      <div className="auth-hero-column">
+        {/* Glow orbs */}
+        <div className="auth-glow-orb top-10 left-10 w-72 h-72 bg-emerald-400/20" />
+        <div className="auth-glow-orb bottom-10 right-10 w-80 h-80 bg-teal-500/20" />
+
+        {/* Top bar with Unified Logo & Back to Home */}
+        <div className="relative z-10 flex items-center justify-between">
+          <Logo to="/" size="medium" inverted={true} showSubtitle={false} />
+
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-100/90 hover:text-white transition"
+          >
+            <ArrowLeft size={14} />
+            <span>Back to Home</span>
+          </Link>
+        </div>
+
+        {/* Center: Headline & Custom Healthcare Illustration */}
+        <div className="relative z-10 my-8 flex flex-col items-center text-center lg:items-start lg:text-left">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-emerald-100 mb-4 backdrop-blur-xs">
+            <Sparkles size={13} className="text-emerald-200" />
+            <span>Join Sweety Healthcare Telemetry</span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Sweety
-          </h1>
-          <p className="mt-1 text-sm text-slate-400">
-            Your personal blood glucose companion
+
+          <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl lg:text-4xl text-white leading-tight">
+            Take control of your{' '}
+            <span className="bg-gradient-to-r from-emerald-100 via-teal-100 to-white bg-clip-text text-transparent">
+              metabolic health.
+            </span>
+          </h2>
+
+          <p className="mt-3 text-sm text-emerald-100/80 max-w-md">
+            Sign up in seconds and gain full visibility into your blood glucose patterns with clinical precision.
           </p>
-        </div>
 
-        {/* Card */}
-        <div className="rounded-3xl border border-slate-100 bg-white p-7 shadow-sm sm:p-9">
-          <div className="mb-6">
-            <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">
-              Create an account
-            </h2>
-            <p className="mt-1 text-xs text-slate-400">
-              Start tracking your glucose levels and take control of your health
-            </p>
+          {/* Healthcare Illustration */}
+          <div className="mt-6 w-full max-w-sm">
+            <HealthcareIllustration className="animate-float-gentle" showBanner={true} />
           </div>
 
-          {/* Success Alert */}
-          {successMessage && (
-            <div className="mb-6 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-              <CheckCircle2
-                size={19}
-                className="mt-0.5 shrink-0 text-emerald-600"
-              />
-              <div className="leading-5 font-medium">
-                <p>{successMessage}</p>
-                <p className="mt-1 text-xs text-emerald-700">
-                  Redirecting to your dashboard...
-                </p>
-              </div>
+          {/* Micro Benefits Checklist */}
+          <div className="mt-6 hidden lg:flex flex-col gap-2.5 text-xs text-emerald-100/90">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={15} className="text-emerald-300 shrink-0" />
+              <span>Free account setup with zero configuration</span>
             </div>
-          )}
-
-          {/* Server Error Alert */}
-          {serverError && (
-            <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">
-              <AlertCircle size={19} className="mt-0.5 shrink-0 text-red-600" />
-              <p className="leading-5">{serverError}</p>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={15} className="text-emerald-300 shrink-0" />
+              <span>Full privacy and encrypted reading storage</span>
             </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            {/* Full Name Field */}
-            <div>
-              <label
-                htmlFor="name"
-                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500"
-              >
-                Full Name
-              </label>
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                  <User size={18} />
-                </div>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="e.g. Jane Doe"
-                  disabled={isLoading || Boolean(successMessage)}
-                  className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 text-sm text-slate-800 placeholder-slate-400 transition focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-slate-50 ${
-                    errors.name
-                      ? 'border-red-300 focus:border-red-500'
-                      : 'border-slate-200 focus:border-emerald-500'
-                  }`}
-                />
-              </div>
-              {errors.name && (
-                <p className="mt-1.5 text-xs text-red-600">{errors.name}</p>
-              )}
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={15} className="text-emerald-300 shrink-0" />
+              <span>Export doctor-ready reports at any time</span>
             </div>
-
-            {/* Email Field */}
-            <div>
-              <label
-                htmlFor="email"
-                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500"
-              >
-                Email Address
-              </label>
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                  <Mail size={18} />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="you@example.com"
-                  disabled={isLoading || Boolean(successMessage)}
-                  className={`w-full rounded-xl border bg-white py-3 pl-11 pr-4 text-sm text-slate-800 placeholder-slate-400 transition focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-slate-50 ${
-                    errors.email
-                      ? 'border-red-300 focus:border-red-500'
-                      : 'border-slate-200 focus:border-emerald-500'
-                  }`}
-                />
-              </div>
-              {errors.email && (
-                <p className="mt-1.5 text-xs text-red-600">{errors.email}</p>
-              )}
-            </div>
-
-            {/* Password Field */}
-            <div>
-              <label
-                htmlFor="password"
-                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500"
-              >
-                Password
-              </label>
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                  <Lock size={18} />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="At least 8 characters"
-                  disabled={isLoading || Boolean(successMessage)}
-                  className={`w-full rounded-xl border bg-white py-3 pl-11 pr-11 text-sm text-slate-800 placeholder-slate-400 transition focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-slate-50 ${
-                    errors.password
-                      ? 'border-red-300 focus:border-red-500'
-                      : 'border-slate-200 focus:border-emerald-500'
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  disabled={isLoading || Boolean(successMessage)}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="mt-1.5 text-xs text-red-600">{errors.password}</p>
-              )}
-            </div>
-
-            {/* Confirm Password Field */}
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500"
-              >
-                Confirm Password
-              </label>
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                  <Lock size={18} />
-                </div>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Re-type your password"
-                  disabled={isLoading || Boolean(successMessage)}
-                  className={`w-full rounded-xl border bg-white py-3 pl-11 pr-11 text-sm text-slate-800 placeholder-slate-400 transition focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-slate-50 ${
-                    errors.confirmPassword
-                      ? 'border-red-300 focus:border-red-500'
-                      : 'border-slate-200 focus:border-emerald-500'
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600"
-                  aria-label={
-                    showConfirmPassword ? 'Hide password' : 'Show password'
-                  }
-                  disabled={isLoading || Boolean(successMessage)}
-                >
-                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="mt-1.5 text-xs text-red-600">
-                  {errors.confirmPassword}
-                </p>
-              )}
-            </div>
-
-            {/* Password Requirements Helper Checklist */}
-            <div className="space-y-1.5 rounded-xl bg-slate-50 p-3 text-xs text-slate-500">
-              <div className="flex items-center gap-2">
-                <CheckCircle2
-                  size={14}
-                  className={
-                    isPasswordLongEnough ? 'text-emerald-600' : 'text-slate-300'
-                  }
-                />
-                <span
-                  className={
-                    isPasswordLongEnough ? 'text-slate-700' : 'text-slate-400'
-                  }
-                >
-                  At least 8 characters
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2
-                  size={14}
-                  className={
-                    doPasswordsMatch ? 'text-emerald-600' : 'text-slate-300'
-                  }
-                />
-                <span
-                  className={
-                    doPasswordsMatch ? 'text-slate-700' : 'text-slate-400'
-                  }
-                >
-                  Passwords match
-                </span>
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading || Boolean(successMessage)}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 py-3.5 px-4 font-semibold text-white shadow-md shadow-emerald-100 transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 size={19} className="animate-spin" />
-                  <span>Creating account...</span>
-                </>
-              ) : successMessage ? (
-                <>
-                  <CheckCircle2 size={19} />
-                  <span>Account Created!</span>
-                </>
-              ) : (
-                <>
-                  <span>Create Account</span>
-                  <ArrowRight size={17} />
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Switch to Login */}
-          <div className="mt-7 border-t border-slate-100 pt-6 text-center">
-            <p className="text-xs text-slate-500">
-              Already have an account?{' '}
-              <Link
-                to="/login"
-                className="font-semibold text-emerald-700 transition hover:text-emerald-800"
-              >
-                Sign in
-              </Link>
-            </p>
           </div>
         </div>
 
-        {/* Footer info */}
-        <p className="mt-8 text-center text-xs text-slate-400">
-          © 2026 Sweety Glucose Tracker. Your health, your priority.
-        </p>
+        {/* Footer info in Hero panel */}
+        <div className="relative z-10 hidden lg:block pt-4 border-t border-white/10 text-xs text-emerald-100/70">
+          <p>© 2026 Sweety. Clinical Intelligence & Glycemic Care.</p>
+        </div>
+      </div>
+
+      {/* ======================================================== */}
+      {/* RIGHT COLUMN: SIGNUP FORM CARD                           */}
+      {/* ======================================================== */}
+      <div className="auth-form-column">
+        {/* Top bar controls */}
+        <div className="absolute top-5 right-5 flex items-center gap-3">
+          <ThemeToggle className="rounded-xl border border-[#E0E9E2] dark:border-[#1E3E32] bg-white dark:bg-[#12241D] p-2.5 text-[#174F3D] dark:text-[#68B18C] shadow-xs hover:bg-[#EAF3ED] dark:hover:bg-[#162E25]" />
+        </div>
+
+        <div className="auth-form-container">
+          {/* Mobile Logo display */}
+          <div className="mb-6 flex justify-center lg:hidden">
+            <Logo to="/" size="medium" showSubtitle={true} subtitle="Clinical Intelligence" />
+          </div>
+
+          {/* Card */}
+          <div className="auth-card">
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold tracking-tight text-[#193D32] dark:text-[#F0F6F2]">
+                Create an account
+              </h1>
+              <p className="mt-1 text-xs text-[#788A80] dark:text-[#8AA497]">
+                Start tracking your glucose levels and take control of your health
+              </p>
+            </div>
+
+            {/* Success Alert */}
+            {successMessage && (
+              <div className="mb-6 flex items-start gap-3 rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50 dark:bg-emerald-950/40 p-4 text-sm text-emerald-800 dark:text-emerald-300">
+                <CheckCircle2
+                  size={19}
+                  className="mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400"
+                />
+                <div className="leading-5 font-medium">
+                  <p>{successMessage}</p>
+                  <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">
+                    Redirecting to your dashboard...
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Server Error Alert */}
+            {serverError && (
+              <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 dark:border-red-900/60 bg-red-50 dark:bg-red-950/40 p-4 text-sm text-red-700 dark:text-red-300">
+                <AlertCircle size={19} className="mt-0.5 shrink-0 text-red-600 dark:text-red-400" />
+                <p className="leading-5">{serverError}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+              {/* Full Name Field */}
+              <div>
+                <label
+                  htmlFor="name"
+                  className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#193D32] dark:text-[#F0F6F2]"
+                >
+                  Full Name
+                </label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 dark:text-[#8AA497]">
+                    <User size={18} />
+                  </div>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    autoComplete="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="e.g. Jane Doe"
+                    disabled={isLoading || Boolean(successMessage)}
+                    className={`auth-input ${errors.name ? 'has-error' : ''}`}
+                  />
+                </div>
+                {errors.name && (
+                  <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">{errors.name}</p>
+                )}
+              </div>
+
+              {/* Email Field */}
+              <div>
+                <label
+                  htmlFor="email"
+                  className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#193D32] dark:text-[#F0F6F2]"
+                >
+                  Email Address
+                </label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 dark:text-[#8AA497]">
+                    <Mail size={18} />
+                  </div>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="you@example.com"
+                    disabled={isLoading || Boolean(successMessage)}
+                    className={`auth-input ${errors.email ? 'has-error' : ''}`}
+                  />
+                </div>
+                {errors.email && (
+                  <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">{errors.email}</p>
+                )}
+              </div>
+
+              {/* Password Field */}
+              <div>
+                <label
+                  htmlFor="password"
+                  className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#193D32] dark:text-[#F0F6F2]"
+                >
+                  Password
+                </label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 dark:text-[#8AA497]">
+                    <Lock size={18} />
+                  </div>
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="At least 8 characters"
+                    disabled={isLoading || Boolean(successMessage)}
+                    className={`auth-input pr-11 ${errors.password ? 'has-error' : ''}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-[#174F3D] dark:text-[#8AA497] dark:hover:text-[#F0F6F2]"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    disabled={isLoading || Boolean(successMessage)}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">{errors.password}</p>
+                )}
+              </div>
+
+              {/* Confirm Password Field */}
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#193D32] dark:text-[#F0F6F2]"
+                >
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 dark:text-[#8AA497]">
+                    <Lock size={18} />
+                  </div>
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Re-type your password"
+                    disabled={isLoading || Boolean(successMessage)}
+                    className={`auth-input pr-11 ${errors.confirmPassword ? 'has-error' : ''}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-[#174F3D] dark:text-[#8AA497] dark:hover:text-[#F0F6F2]"
+                    aria-label={
+                      showConfirmPassword ? 'Hide password' : 'Show password'
+                    }
+                    disabled={isLoading || Boolean(successMessage)}
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">
+                    {errors.confirmPassword}
+                  </p>
+                )}
+              </div>
+
+              {/* Password Requirements Helper Checklist */}
+              <div className="space-y-1.5 rounded-xl bg-[#EAF3ED]/60 dark:bg-[#162E25] border border-[#E0E9E2] dark:border-[#1E3E32] p-3 text-xs text-[#193D32] dark:text-[#F0F6F2]">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2
+                    size={14}
+                    className={
+                      isPasswordLongEnough
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-slate-300 dark:text-slate-600'
+                    }
+                  />
+                  <span
+                    className={
+                      isPasswordLongEnough
+                        ? 'text-[#193D32] dark:text-[#F0F6F2] font-medium'
+                        : 'text-[#788A80] dark:text-[#8AA497]'
+                    }
+                  >
+                    At least 8 characters
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2
+                    size={14}
+                    className={
+                      doPasswordsMatch
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-slate-300 dark:text-slate-600'
+                    }
+                  />
+                  <span
+                    className={
+                      doPasswordsMatch
+                        ? 'text-[#193D32] dark:text-[#F0F6F2] font-medium'
+                        : 'text-[#788A80] dark:text-[#8AA497]'
+                    }
+                  >
+                    Passwords match
+                  </span>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isLoading || Boolean(successMessage)}
+                className="btn-forest-gradient mt-2 flex w-full items-center justify-center gap-2 rounded-xl py-3.5 px-4 font-semibold text-white shadow-md transition disabled:cursor-not-allowed disabled:opacity-70 cursor-pointer"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 size={19} className="animate-spin" />
+                    <span>Creating account...</span>
+                  </>
+                ) : successMessage ? (
+                  <>
+                    <CheckCircle2 size={19} />
+                    <span>Account Created!</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Create Account</span>
+                    <ArrowRight size={17} />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Switch to Login */}
+            <div className="mt-7 border-t border-[#E0E9E2] dark:border-[#1E3E32] pt-6 text-center">
+              <p className="text-xs text-[#788A80] dark:text-[#8AA497]">
+                Already have an account?{' '}
+                <Link
+                  to="/login"
+                  className="font-bold text-[#174F3D] dark:text-[#68B18C] hover:underline transition"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          {/* Footer on mobile */}
+          <div className="mt-6 text-center text-xs text-[#788A80] dark:text-[#8AA497] lg:hidden">
+            <Link to="/" className="inline-flex items-center gap-1 hover:underline text-[#174F3D] dark:text-[#68B18C]">
+              <ArrowLeft size={13} />
+              <span>Back to Sweety Home</span>
+            </Link>
+            <p className="mt-2">© 2026 Sweety • Clinical Intelligence</p>
+          </div>
+        </div>
       </div>
     </div>
   );

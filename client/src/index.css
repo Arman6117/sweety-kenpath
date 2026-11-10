@@ -37,11 +37,13 @@ body.dark,
 /* Backgrounds across all pages */
 .dark .bg-\[\#f6faf8\],
 .dark .bg-\[\#F3F6F1\],
+.dark .bg-\[\#F4F7F2\],
 .dark .bg-\[\#F8FAF8\],
 .dark .bg-\[\#FAFCFA\],
 .dark .sweety-dashboard-wrapper,
 [data-theme="dark"] .bg-\[\#f6faf8\],
 [data-theme="dark"] .bg-\[\#F3F6F1\],
+[data-theme="dark"] .bg-\[\#F4F7F2\],
 [data-theme="dark"] .bg-\[\#F8FAF8\],
 [data-theme="dark"] .bg-\[\#FAFCFA\],
 [data-theme="dark"] .sweety-dashboard-wrapper {
@@ -57,6 +59,10 @@ body.dark,
 }
 
 /* Secondary elevated surfaces & inner cards */
+.dark .bg-\[\#EAF3ED\],
+.dark .bg-\[\#EBF5F0\],
+[data-theme="dark"] .bg-\[\#EAF3ED\],
+[data-theme="dark"] .bg-\[\#EBF5F0\],
 .dark .bg-slate-50,
 .dark .bg-slate-50\/80,
 .dark .bg-slate-50\/70,

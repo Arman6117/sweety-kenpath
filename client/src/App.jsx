@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute, PublicRoute } from './components/ProtectedRoute';
+import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import ReadingHistory from './pages/ReadingHistory';
 import Reports from './pages/Reports';
@@ -15,8 +16,12 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <Routes>
+            {/* Public Landing Page */}
+            <Route path="/" element={<Landing />} />
+
+            {/* Protected Routes */}
             <Route
-              path="/"
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <Dashboard />

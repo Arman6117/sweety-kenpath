@@ -1,18 +1,17 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Heart } from 'lucide-react';
+import Logo from './Logo';
 
 export function LoadingScreen() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f6faf8]">
+    <div className="flex min-h-screen items-center justify-center bg-[#F4F7F2] dark:bg-[#0B1612]">
       <div className="flex flex-col items-center gap-4 text-center">
-        <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-100 animate-pulse">
-          <Heart size={34} fill="white" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-slate-900">Sweety</h2>
-          <p className="mt-1 text-xs text-slate-400">Loading your health space...</p>
-        </div>
+        <Logo
+          size="large"
+          layout="stacked"
+          subtitle="Loading your clinical health space..."
+          className="animate-pulse"
+        />
       </div>
     </div>
   );
@@ -41,11 +40,10 @@ export function PublicRoute({ children }) {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
 }
 
 export default ProtectedRoute;
-
