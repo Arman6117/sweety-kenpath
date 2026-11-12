@@ -289,3 +289,19 @@ Sweety is a software demonstration and personal tracking application developed f
 
 - The backend service is licensed under the [ISC License](server/package.json).
 - The client frontend application is marked private (`"private": true` in `client/package.json`).
+
+## Notes
+
+### Assumptions
+- Glucose readings are recorded in mg/dL.
+- Each user can record one reading for each of the four defined daily measurement slots.
+- A maximum of four readings can be recorded per calendar day.
+- Future-dated readings are not permitted.
+- Report calculations use the selected calendar date and the configured IST timezone.
+
+### Future Improvements
+- Add automated CI checks and deployment workflows.
+- Improve automated frontend and end-to-end test coverage.
+- Introduce data export functionality for personal records.
+- Add more detailed visualizations and historical trends.
+- Improve production monitoring, logging, and rate-limiting scalability.
