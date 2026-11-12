@@ -1,105 +1,23 @@
-
 const prisma = require("../config/prisma");
+const {
+  ALLOWED_SLOTS,
+  isValidUuid,
+  getSlotLabel,
+  getDuplicateMessage,
+  validateReadingDate,
+  validateReading,
+  isValidDateFilter
+} = require("../utils/readingValidation");
 
-// Allowed glucose reading slots
-const ALLOWED_SLOTS = [
-  "MORNING",
-  "AFTER_BREAKFAST",
-  "AFTER_LUNCH",
-  "AFTER_DINNER"
-];
-
-// Convert slot name into a readable label
-const getSlotLabel = (slot) => {
-  return slot.toLowerCase().replaceAll("_", " ");
-};
-
-// Generate duplicate reading error message
-const getDuplicateMessage = (slot) => {
-  return `You already have an ${getSlotLabel(slot)} reading for this date.`;
-};
-
-// Validate date in YYYY-MM-DD format.
-// Use India local date for the no-future-date rule.
-const validateReadingDate = (dateString) => {
-  if (
-    typeof dateString !== "string" ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(dateString)
-  ) {
-    return null;
-  }
-
-  const date = new Date(`${dateString}T00:00:00.000Z`);
-
-  if (
-    Number.isNaN(date.getTime()) ||
-    date.toISOString().slice(0, 10) !== dateString
-  ) {
-    return null;
-  }
-
-  const indiaToday = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Kolkata",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).format(new Date());
-
-  if (dateString > indiaToday) {
-    return null;
-  }
-
-  return date;
-};
-
-// Validate glucose reading fields
-const validateReading = ({ date, slot, value }) => {
-  if (!date || !slot) {
-    return "Date and slot are required.";
-  }
-
-  if (value === undefined || value === null || value === "") {
-    return "Please enter a glucose value.";
-  }
-
-  const readingDate = validateReadingDate(date);
-
-  if (!readingDate) {
-    if (
-      typeof date === "string" &&
-      /^\d{4}-\d{2}-\d{2}$/.test(date)
-    ) {
-      const parsedDate = new Date(`${date}T00:00:00.000Z`);
-
-      if (
-        !Number.isNaN(parsedDate.getTime()) &&
-        parsedDate.toISOString().slice(0, 10) === date
-      ) {
-        return "Date cannot be in the future.";
-      }
-    }
-
-    return "Please provide a valid date.";
-  }
-
-  if (!ALLOWED_SLOTS.includes(slot)) {
-    return "Invalid reading slot.";
-  }
-
-  if (!Number.isInteger(value) || value < 40 || value > 600) {
-    return "Value must be between 40 and 600 mg/dl.";
-  }
-
-  return null;
-};
-
-// CREATE READING
+/**
+ * CREATE READING
+ * POST /api/readings
+ */
 const createReading = async (req, res) => {
   try {
     const { date, slot, value } = req.body;
 
     const validationError = validateReading({ date, slot, value });
-
     if (validationError) {
       return res.status(400).json({
         success: false,
@@ -110,22 +28,6 @@ const createReading = async (req, res) => {
     const readingDate = validateReadingDate(date);
     const userId = req.user.userId;
 
-    // Check the number of readings for this user on this date
-    const dailyCount = await prisma.reading.count({
-      where: {
-        userId,
-        date: readingDate
-      }
-    });
-
-    if (dailyCount >= 4) {
-      return res.status(400).json({
-        success: false,
-        message: "You can add only 4 readings per day."
-      });
-    }
-
-    // Check whether this slot already has a reading
     const existingReading = await prisma.reading.findUnique({
       where: {
         userId_date_slot: {
@@ -143,6 +45,20 @@ const createReading = async (req, res) => {
       });
     }
 
+    const dailyCount = await prisma.reading.count({
+      where: {
+        userId,
+        date: readingDate
+      }
+    });
+
+    if (dailyCount >= 4) {
+      return res.status(400).json({
+        success: false,
+        message: "You can add only 4 readings per day."
+      });
+    }
+
     const reading = await prisma.reading.create({
       data: {
         userId,
@@ -157,15 +73,13 @@ const createReading = async (req, res) => {
       message: "Glucose reading added successfully.",
       reading
     });
-
   } catch (error) {
     console.error("Create reading error:", error);
 
-    // Handle simultaneous duplicate requests
     if (error.code === "P2002") {
       return res.status(409).json({
         success: false,
-        message: getDuplicateMessage(req.body.slot)
+        message: getDuplicateMessage(req.body?.slot || "reading")
       });
     }
 
@@ -176,25 +90,83 @@ const createReading = async (req, res) => {
   }
 };
 
-// GET ALL READINGS FOR THE LOGGED-IN USER
+/**
+ * GET ALL READINGS FOR THE LOGGED-IN USER
+ * GET /api/readings
+ * Supports optional date filtering (?date=YYYY-MM-DD or ?startDate=...&endDate=...)
+ * Supports optional pagination (?page=1&limit=20)
+ * Sorts by date descending, then slot in natural daily order (MORNING -> AFTER_DINNER)
+ */
 const getReadings = async (req, res) => {
   try {
+    const userId = req.user.userId;
+    const { date, startDate, endDate, page, limit } = req.query;
+
+    const where = { userId };
+
+    // Single date filter
+    if (date) {
+      if (!isValidDateFilter(date)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid date format for filter. Expected YYYY-MM-DD."
+        });
+      }
+      where.date = new Date(`${date}T00:00:00.000Z`);
+    } else if (startDate || endDate) {
+      // Date range filter
+      where.date = {};
+      if (startDate) {
+        if (!isValidDateFilter(startDate)) {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid startDate format. Expected YYYY-MM-DD."
+          });
+        }
+        where.date.gte = new Date(`${startDate}T00:00:00.000Z`);
+      }
+      if (endDate) {
+        if (!isValidDateFilter(endDate)) {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid endDate format. Expected YYYY-MM-DD."
+          });
+        }
+        where.date.lte = new Date(`${endDate}T00:00:00.000Z`);
+      }
+    }
+
+    // Determine pagination if requested
+    const isPaginated = page !== undefined || limit !== undefined;
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.max(1, Math.min(100, parseInt(limit, 10) || 20));
+
+    const totalCount = await prisma.reading.count({ where });
+
     const readings = await prisma.reading.findMany({
-      where: {
-        userId: req.user.userId
-      },
+      where,
       orderBy: [
         { date: "desc" },
-        { createdAt: "desc" }
-      ]
+        { slot: "asc" }
+      ],
+      ...(isPaginated ? { skip: (pageNum - 1) * limitNum, take: limitNum } : {})
     });
 
-    return res.status(200).json({
+    const response = {
       success: true,
       count: readings.length,
+      total: totalCount,
       readings
-    });
+    };
 
+    if (isPaginated) {
+      response.page = pageNum;
+      response.limit = limitNum;
+      response.totalPages = Math.ceil(totalCount / limitNum) || 1;
+      response.hasMore = pageNum * limitNum < totalCount;
+    }
+
+    return res.status(200).json(response);
   } catch (error) {
     console.error("Get readings error:", error);
 
@@ -205,10 +177,21 @@ const getReadings = async (req, res) => {
   }
 };
 
-// GET ONE READING
+/**
+ * GET ONE READING
+ * GET /api/readings/:id
+ * Strict user data isolation: returns 404 if reading belongs to another user
+ */
 const getReadingById = async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (!isValidUuid(id)) {
+      return res.status(404).json({
+        success: false,
+        message: "Reading not found."
+      });
+    }
 
     const reading = await prisma.reading.findFirst({
       where: {
@@ -228,7 +211,6 @@ const getReadingById = async (req, res) => {
       success: true,
       reading
     });
-
   } catch (error) {
     console.error("Get reading error:", error);
 
@@ -239,14 +221,24 @@ const getReadingById = async (req, res) => {
   }
 };
 
-// UPDATE READING
+/**
+ * UPDATE READING
+ * PUT /api/readings/:id
+ * Validates fields, preserves daily limits & slot uniqueness, prevents owner tampering
+ */
 const updateReading = async (req, res) => {
   try {
     const { id } = req.params;
     const { date, slot, value } = req.body;
 
-    const validationError = validateReading({ date, slot, value });
+    if (!isValidUuid(id)) {
+      return res.status(404).json({
+        success: false,
+        message: "Reading not found."
+      });
+    }
 
+    const validationError = validateReading({ date, slot, value });
     if (validationError) {
       return res.status(400).json({
         success: false,
@@ -257,7 +249,6 @@ const updateReading = async (req, res) => {
     const readingDate = validateReadingDate(date);
     const userId = req.user.userId;
 
-    // Confirm that this reading belongs to the logged-in user
     const existingReading = await prisma.reading.findFirst({
       where: {
         id,
@@ -272,7 +263,6 @@ const updateReading = async (req, res) => {
       });
     }
 
-    // Check daily limit, excluding the reading being updated
     const dailyCount = await prisma.reading.count({
       where: {
         userId,
@@ -288,7 +278,6 @@ const updateReading = async (req, res) => {
       });
     }
 
-    // Check for another reading occupying the requested slot
     const duplicate = await prisma.reading.findFirst({
       where: {
         userId,
@@ -319,14 +308,13 @@ const updateReading = async (req, res) => {
       message: "Glucose reading updated successfully.",
       reading: updatedReading
     });
-
   } catch (error) {
     console.error("Update reading error:", error);
 
     if (error.code === "P2002") {
       return res.status(409).json({
         success: false,
-        message: getDuplicateMessage(req.body.slot)
+        message: getDuplicateMessage(req.body?.slot || "reading")
       });
     }
 
@@ -337,11 +325,22 @@ const updateReading = async (req, res) => {
   }
 };
 
-// DELETE READING
+/**
+ * DELETE READING
+ * DELETE /api/readings/:id
+ * Strict ownership check: only the owner can delete their reading
+ */
 const deleteReading = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.userId;
+
+    if (!isValidUuid(id)) {
+      return res.status(404).json({
+        success: false,
+        message: "Reading not found."
+      });
+    }
 
     const reading = await prisma.reading.findFirst({
       where: {
@@ -365,7 +364,6 @@ const deleteReading = async (req, res) => {
       success: true,
       message: "Glucose reading deleted successfully."
     });
-
   } catch (error) {
     console.error("Delete reading error:", error);
 
@@ -382,6 +380,7 @@ module.exports = {
   getReadingById,
   updateReading,
   deleteReading,
+  // Re-export for backward compatibility with existing tests
   validateReading,
   validateReadingDate,
   ALLOWED_SLOTS,

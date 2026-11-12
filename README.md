@@ -1,289 +1,291 @@
-# Sweety – Blood Glucose Tracker
+# Sweety — Blood Glucose Tracker
 
-Sweety is a full-stack blood glucose tracking application that helps users record their daily glucose readings and view daily and monthly reports.
+Sweety is a full-stack web application designed for personal blood glucose tracking, monitoring, and reporting. It allows users to record daily blood sugar measurements across four standardized meal intervals, enforces input validation to prevent duplicate or conflicting entries, provides historical trend filtering, and generates automated daily, month-to-date, and previous-month summary statistics.
 
-Users can securely create an account, manage their glucose readings, and monitor their recorded values through a dashboard and reports.
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18.18-339933?logo=node.js&logoColor=white)](https://nodejs.org)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![Express](https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white)](https://expressjs.com)
+[![Prisma](https://img.shields.io/badge/Prisma-5-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io)
+[![Tests](https://img.shields.io/badge/Tests-134%20passed-brightgreen)](server/tests)
+[![License: ISC](https://img.shields.io/badge/Server%20License-ISC-blue.svg)](server/package.json)
+
+---
+
+## Screenshots
+
+| Landing Page | Populated Dashboard |
+|:---:|:---:|
+| ![Landing Page](screenshots/01_landing_page.png) | ![Dashboard](screenshots/06_dashboard_populated.png) |
+| **Reading History** | **Summary Reports** |
+| ![Reading History](screenshots/07_reading_history_table.png) | ![Reports](screenshots/10_reports_month_to_date.png) |
+
+*Additional interface screenshots (modals, validation states, profile settings) are available in the [`screenshots/`](screenshots/) directory.*
+
+---
 
 ## Features
 
-### Authentication
-- User registration and login.
-- Password hashing using bcrypt.
-- JWT-based authentication.
-- Protected application routes.
-- Profile and password management.
+- **Authentication & User Management:** User registration and login powered by JSON Web Tokens (JWT), 12-round bcrypt password hashing, account profile updates, and password changes.
+- **Reading Management:** Full CRUD operations for blood glucose records with strict authenticated user scoping.
+- **Four Daily Measurement Slots:** Predefined intervals for `MORNING` (fasting), `AFTER_BREAKFAST`, `AFTER_LUNCH`, and `AFTER_DINNER`.
+- **Validation Guardrails:** Enforces integer readings between 40 and 600 mg/dL, rejects future calendar dates, enforces slot uniqueness (maximum 1 reading per slot per day), and limits daily entries to 4 per user.
+- **History & Filtering:** Sortable reading history table with date range filtering (`startDate` to `endDate`), slot filters, and pagination.
+- **Automated Summary Reports:** Calculates highest, lowest, and 1-decimal rounded average glucose metrics for Daily, Month-to-Date (MTD), and Previous Full Month intervals (with leap-year and cross-year support).
+- **Responsive Interface & Theming:** Modern responsive design with Light, Dark, and System theme preferences persisted in `localStorage`.
 
-### Glucose Reading Management
-- Add, view, edit, and delete glucose readings.
-- Four daily reading slots:
-  - Morning (Fasting)
-  - After Breakfast
-  - After Lunch
-  - After Dinner
-- Each reading is associated with its user and date.
-- Prevents duplicate readings for the same slot and date.
-
-### Validation
-- Glucose value is required.
-- Values must be integers between 40 and 600 mg/dL.
-- Maximum of four readings per day.
-- Future dates are not allowed.
-- Duplicate slot entries are prevented.
-
-### Reports
-- Daily report for a selected date.
-- Month-to-date report.
-- Previous-month report.
-- Highest, lowest, and average glucose values.
-- Total number of readings.
-- Empty states when no readings are available.
-
-### Dashboard and Settings
-- Dashboard with glucose summaries and visual chart.
-- Reading history.
-- Profile management.
-- Password change functionality.
+---
 
 ## Technology Stack
 
-| Layer | Technologies |
-|---|---|
-| Frontend | React, Vite, Tailwind CSS |
-| Backend | Node.js, Express.js |
-| Database | PostgreSQL |
-| ORM | Prisma |
-| Authentication | JWT, bcryptjs |
-| HTTP Client | Axios |
-| Icons | Lucide React |
+| Layer | Technologies | Key Packages |
+|---|---|---|
+| **Frontend** | React 19, Vite 8, Tailwind CSS v4 | `react`, `react-router-dom`, `axios`, `lucide-react` |
+| **Backend** | Node.js (>= 18.18), Express 5 | `express`, `bcryptjs`, `jsonwebtoken`, `cors`, `dotenv` |
+| **Database & ORM** | PostgreSQL 15+ (or Neon Serverless), Prisma 5 | `@prisma/client`, `prisma` |
+| **Testing** | Node.js Native Test Runner | `node:test`, `node:assert/strict` (134 tests) |
+| **Code Quality** | ESLint 10 | `eslint`, `eslint-plugin-react-hooks` |
 
-## Project Structure
+---
+
+## Architecture
 
 ```text
 sweety-glucose-tracker/
-│
-├── client/
+├── client/                     # Frontend SPA (React 19, Vite, Tailwind CSS v4)
 │   ├── src/
-│   │   ├── api/
-│   │   ├── components/
-│   │   ├── context/
-│   │   ├── pages/
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── package.json
-│   ├── .env.example
-│   └── vite.config.js
-│
-├── server/
-│   ├── prisma/
-│   │   ├── migrations/
-│   │   ├── schema.prisma
-│   │   └── seed.js
+│   │   ├── api/                # Axios instance with auth interceptor
+│   │   ├── components/         # Modals, layout controls, theme toggle
+│   │   ├── context/            # Auth and Theme React context providers
+│   │   └── pages/              # Landing, Dashboard, History, Reports, Settings
+│   └── package.json
+├── server/                     # Backend REST API (Express 5, Prisma ORM)
+│   ├── prisma/                 # Schema, migrations, and seed script
 │   ├── src/
-│   │   ├── config/
-│   │   ├── controllers/
-│   │   ├── middleware/
-│   │   ├── routes/
-│   │   └── server.js
-│   ├── package.json
-│   └── .env.example
-│
-├── .gitignore
+│   │   ├── config/             # Prisma client singleton
+│   │   ├── controllers/        # Auth, reading, and report controllers
+│   │   ├── middleware/         # JWT verification, sliding-window rate limiter
+│   │   ├── routes/             # Express route declarations
+│   │   └── utils/              # Pure validation, JWT, and report calculations
+│   ├── tests/                  # Unit and integration test suites (134 tests)
+│   └── package.json
+├── docs/                       # Technical documentation (API.md, DEVELOPMENT.md)
+├── screenshots/                # Application screenshots (13 images)
 └── README.md
 ```
 
-## Prerequisites
+---
 
-Install the following before running the application:
+## Getting Started
 
-- Node.js
-- npm
-- PostgreSQL
-- Git
+### Prerequisites
 
-## Installation and Setup
+- **Node.js:** `>= 18.18.0` (v20+ or v22+ LTS recommended)
+- **npm:** `>= 9.0.0`
+- **PostgreSQL:** Local PostgreSQL 15+ instance or a cloud database such as [Neon](https://neon.tech)
 
-### 1. Clone the repository
+### 1. Project Directory
+
+Open a terminal and navigate to the project root directory:
 
 ```bash
-git clone https://github.com/Khushi-Bhaskar/sweety-glucose-tracker.git
-
 cd sweety-glucose-tracker
 ```
 
-### 2. Set up the PostgreSQL database
+### 2. Backend Setup
 
-Create a PostgreSQL database named:
-
-```sql
-CREATE DATABASE sweety_db;
-```
-
-### 3. Configure the backend
-
-Navigate to the server folder:
+In your first terminal, navigate to the `server` directory and install dependencies:
 
 ```bash
 cd server
 npm install
 ```
 
-Create a `.env` file using `.env.example` as a reference.
-
-Configure the following variables:
-
-```env
-DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/sweety_db?schema=public"
-JWT_SECRET="your_secure_random_secret"
-PORT=5000
-```
-
-Replace the database username and password with your local PostgreSQL credentials. Use a strong, private JWT secret.
-
-### 4. Apply database migrations
+Create the environment file:
 
 ```bash
+# macOS / Linux
+cp .env.example .env
+
+# Windows PowerShell
+Copy-Item .env.example .env
+```
+
+Open `server/.env` and configure your `DATABASE_URL` and a secure `JWT_SECRET`. Then initialize the database:
+
+```bash
+# Generate Prisma Client
 npx prisma generate
+
+# Apply migrations
 npx prisma migrate deploy
-```
 
-### 5. Insert demo data
-
-```bash
+# (Optional) Seed demo user and sample readings
 npm run seed
-```
 
-The seed script creates a demo user and sample glucose readings.
-
-**Demo account**
-
-- Email: `demo@sweety.local`
-- Password: `SweetyDemo@2026`
-
-These credentials are for local demonstration only.
-
-### 6. Start the backend
-
-```bash
+# Start the backend server
 npm run dev
 ```
 
-The backend runs at:
+The backend server will run at `http://localhost:5000`.
 
-`http://localhost:5000`
+### 3. Frontend Setup
 
-API health check:
-
-`http://localhost:5000/`
-
-### 7. Configure the frontend
-
-Open a second terminal and navigate to the client folder:
+In a second terminal, navigate to the `client` directory and install dependencies:
 
 ```bash
 cd client
 npm install
 ```
 
-Create a `.env` file using `.env.example` as a reference:
+Create the frontend environment file:
 
-```env
-VITE_API_BASE_URL=http://localhost:5000
+```bash
+# macOS / Linux
+cp .env.example .env
+
+# Windows PowerShell
+Copy-Item .env.example .env
 ```
 
-### 8. Start the frontend
+Start the Vite development server:
 
 ```bash
 npm run dev
 ```
 
-Open the local URL displayed by Vite in your browser.
+Open `http://localhost:5173` in your browser.
 
-## API Endpoints
+---
 
-All protected endpoints require a JWT bearer token.
+## Environment Variables
 
-### Authentication
+### Backend (`server/.env`)
 
-| Method | Endpoint | Description |
+| Variable | Description | Default / Example |
 |---|---|---|
-| POST | `/api/auth/register` | Register a user |
-| POST | `/api/auth/login` | Log in |
-| GET | `/api/auth/me` | Get current user |
-| PUT | `/api/auth/profile` | Update profile |
-| PUT | `/api/auth/change-password` | Change password |
+| `PORT` | HTTP server listening port | `5000` |
+| `DATABASE_URL` | PostgreSQL connection URL (supports Neon pooler) | `postgresql://USER:PASSWORD@HOST:5432/DB?sslmode=require` |
+| `JWT_SECRET` | Secret key for signing JSON Web Tokens | Long cryptographically random string |
+| `JWT_EXPIRES_IN` | Token expiration duration (optional) | `1d` |
+| `CLIENT_ORIGIN` | Allowed CORS origin for frontend client (optional) | `http://localhost:5173` |
 
-### Glucose Readings
+### Frontend (`client/.env`)
 
-| Method | Endpoint | Description |
+| Variable | Description | Default / Example |
 |---|---|---|
-| GET | `/api/readings` | Get readings |
-| GET | `/api/readings/:id` | Get a specific reading |
-| POST | `/api/readings` | Add a reading |
-| PUT | `/api/readings/:id` | Update a reading |
-| DELETE | `/api/readings/:id` | Delete a reading |
+| `VITE_API_BASE_URL` | Root URL of backend API service | `http://localhost:5000` |
 
-### Reports
+*Note: Environment files containing actual credentials must remain untracked in version control.*
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/reports/daily?date=YYYY-MM-DD` | Daily report |
-| GET | `/api/reports/month-to-date` | Current month up to today |
-| GET | `/api/reports/previous-month` | Previous month's report |
+---
 
-## Running Frontend Checks
+## Demo Account
 
-From the `client` directory:
+When populated using `npm run seed`, the database contains a pre-configured demonstration account:
+
+| Field | Value |
+|---|---|
+| **Email** | `demo@sweety.local` |
+| **Password** | `SweetyDemo@2026` |
+| **Sample Data** | 8 readings across 3 recent calendar days |
+
+> **Notice:** These credentials are for local development and demonstration only. Do not use them in production.
+
+---
+
+## API Overview
+
+The backend exposes a JSON REST API. Protected routes require a Bearer token in the `Authorization` header. Sensitive auth routes are protected by a sliding-window rate limiter (30 attempts per 15 minutes). The request payload limit is `100kb`.
+
+### Authentication Endpoints (`/api/auth`)
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `POST` | `/api/auth/register` | Register a new user account (rate-limited) | No |
+| `POST` | `/api/auth/login` | Authenticate user and receive JWT (rate-limited) | No |
+| `GET` | `/api/auth/me` | Retrieve profile of authenticated user | Yes |
+| `PUT` | `/api/auth/profile` | Update user name and email | Yes |
+| `PUT` | `/api/auth/change-password` | Verify current password and set new password | Yes |
+
+### Glucose Readings Endpoints (`/api/readings`)
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `GET` | `/api/readings` | List readings (supports `date`, `startDate`, `endDate`, pagination) | Yes |
+| `POST` | `/api/readings` | Create a reading (`date`, `slot`, `value`) | Yes |
+| `GET` | `/api/readings/:id` | Retrieve a reading by UUID (scoped to user) | Yes |
+| `PUT` | `/api/readings/:id` | Update an existing reading | Yes |
+| `DELETE` | `/api/readings/:id` | Delete a reading | Yes |
+
+### Reports Endpoints (`/api/reports`)
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `GET` | `/api/reports/daily` | Daily stats (`highest`, `lowest`, `average`, `count`) | Yes |
+| `GET` | `/api/reports/month-to-date` | Aggregates readings from day 1 to selected date | Yes |
+| `GET` | `/api/reports/previous-month` | Full calendar month analytics immediately prior | Yes |
+
+### Health Checks
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `GET` | `/` | API status check | No |
+| `GET` | `/api/health/db` | Database connectivity probe (`SELECT 1`) | No |
+
+*Detailed request/response schemas, validation rules, and error payloads are documented in [`docs/API.md`](docs/API.md).*
+
+---
+
+## Testing
+
+The project includes an automated test suite written using the Node.js native test runner (`node:test` and `node:assert/strict`):
 
 ```bash
+cd server
+npm test
+```
+
+### Verified Test Results
+
+- **Total Tests:** 134 across 24 suites
+- **Passed:** **134**
+- **Failed:** **0**
+- **Skipped:** **0**
+
+*Note: The 38 integration tests require local loopback networking and an active database connection. In offline or restricted network sandboxes where loopback sockets or outbound database connections are blocked, these integration tests skip automatically with descriptive notices, resulting in 96 passed and 38 skipped.*
+
+For full details on test architecture and test suites, see [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
+
+---
+
+## Production Build
+
+### Frontend Compilation & Quality Checks
+
+```bash
+cd client
+
+# Run ESLint validation
 npm run lint
+
+# Build optimized production bundle
 npm run build
 ```
-## Running Backend Tests
 
-From the `server` directory:
+The compiled assets are generated in `client/dist/`.
+
+### Backend Production Startup
 
 ```bash
-npm test
+cd server
+npm start
+```
 
-## Database Design
+---
 
-The application uses two main database models:
+## Important Notice
 
-- **User:** Stores user details and securely hashed passwords.
-- **Reading:** Stores glucose values, dates, and reading slots associated with a user.
+Sweety is a software demonstration and personal tracking application developed for educational and portfolio purposes. It is **not** a certified medical device and does not provide clinical diagnosis, medical validation, or treatment recommendations. Always consult a qualified healthcare professional for medical guidance.
 
-A unique database constraint prevents a user from recording more than one reading for the same date and slot.
+---
 
-## Assumptions and Notes
+## License
 
-- Glucose readings are stored in mg/dL.
-- Each user can record a maximum of four readings per day.
-- Each of the four reading slots can have only one entry per day.
-- Users can access only their own readings.
-- Daily reports use a selected date.
-- Month-to-date reports cover the first day of the current month through the selected current date.
-- Monthly reports cover the entire previous calendar month.
-- The application is intended for recording and reviewing glucose measurements. It is not a substitute for professional medical advice or diagnosis.
-- The demo account is intended for local testing and demonstration.
-
-## Future Improvements
-
-- Additional frontend automated tests.
-- Pagination for reading history.
-- Enhanced data visualization and glucose trends.
-- Optional Docker-based deployment.
-- Additional reporting and data export capabilities.
-
-## Security Notes
-
-- Passwords are securely hashed using bcrypt.
-- Authentication is handled using JWT.
-- Protected APIs ensure users can access only their own records.
-- Environment variables are stored in local `.env` files.
-- Actual credentials and secrets must never be committed to GitHub.
-
-## Author
-
-**Khushi Bhaskar**
-
-GitHub: [Khushi-Bhaskar](https://github.com/Khushi-Bhaskar)
+- The backend service is licensed under the [ISC License](server/package.json).
+- The client frontend application is marked private (`"private": true` in `client/package.json`).

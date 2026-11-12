@@ -1,4 +1,3 @@
-
 const express = require("express");
 const router = express.Router();
 
@@ -10,21 +9,18 @@ const {
 } = require("../controllers/authController");
 
 const authMiddleware = require("../middleware/authMiddleware");
+const { authRateLimiter } = require("../middleware/rateLimiter");
 const prisma = require("../config/prisma");
 
-// Register
-router.post("/register", register);
+// Public endpoints with brute-force / credential-stuffing rate limiting
+router.post("/register", authRateLimiter, register);
+router.post("/login", authRateLimiter, login);
 
-// Login
-router.post("/login", login);
-
-// Change password
+// Protected endpoints requiring valid JWT
 router.put("/change-password", authMiddleware, changePassword);
-
-// Update user profile
 router.put("/profile", authMiddleware, updateProfile);
 
-// Get currently logged-in user
+// Get current authenticated user profile
 router.get("/me", authMiddleware, async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
@@ -48,9 +44,8 @@ router.get("/me", authMiddleware, async (req, res) => {
       success: true,
       user
     });
-
   } catch (error) {
-    console.error("Get profile error:", error);
+    console.error("Get /me error:", error);
 
     return res.status(500).json({
       success: false,

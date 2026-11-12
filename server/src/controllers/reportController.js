@@ -1,36 +1,19 @@
-
 const prisma = require("../config/prisma");
+const { getTodayInIndia } = require("../utils/readingValidation");
+const {
+  calculateSummary,
+  validateReportDate,
+  getMonthToDateRange,
+  getPreviousMonthRange
+} = require("../utils/reportUtils");
 
-// Helper: Calculate report statistics
-const calculateSummary = (readings) => {
-  if (readings.length === 0) {
-    return {
-      highest: null,
-      lowest: null,
-      average: null,
-      count: 0
-    };
-  }
-
-  const values = readings.map((reading) => reading.value);
-
-  const highest = Math.max(...values);
-  const lowest = Math.min(...values);
-  const average =
-    Math.round(
-      (values.reduce((total, value) => total + value, 0) /
-        values.length) * 10
-    ) / 10;
-
-  return {
-    highest,
-    lowest,
-    average,
-    count: readings.length
-  };
-};
-
-// Helper: Fetch readings belonging only to the logged-in user
+/**
+ * Fetch readings belonging only to the authenticated user within a date range.
+ * @param {string} userId - UUID of authenticated user
+ * @param {Date} startDate - Inclusive start date
+ * @param {Date} endDate - Inclusive end date
+ * @returns {Promise<Array>}
+ */
 const fetchReadings = async (userId, startDate, endDate) => {
   return prisma.reading.findMany({
     where: {
@@ -42,57 +25,39 @@ const fetchReadings = async (userId, startDate, endDate) => {
     },
     orderBy: [
       { date: "asc" },
-      { createdAt: "asc" }
+      { slot: "asc" }
     ]
   });
 };
 
-// 1. Daily Report
+/**
+ * 1. DAILY REPORT
+ * GET /api/reports/daily?date=YYYY-MM-DD
+ * Returns readings for the selected date, highest, lowest, 1-decimal average, and count.
+ */
 const getDailyReport = async (req, res) => {
   try {
     const { date } = req.query;
 
-    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const validation = validateReportDate(date);
+    if (!validation.isValid) {
       return res.status(400).json({
         success: false,
-        message: "Please provide a valid date in YYYY-MM-DD format."
-      });
-    }
-
-    const parsedDate = new Date(`${date}T00:00:00.000Z`);
-
-    if (
-      Number.isNaN(parsedDate.getTime()) ||
-      parsedDate.toISOString().slice(0, 10) !== date
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide a valid calendar date."
-      });
-    }
-
-    const today = new Date().toLocaleDateString("en-CA", {
-      timeZone: "Asia/Kolkata"
-    });
-
-    if (date > today) {
-      return res.status(400).json({
-        success: false,
-        message: "Future dates are not allowed."
+        message: validation.error
       });
     }
 
     const readings = await fetchReadings(
       req.user.userId,
-      parsedDate,
-      parsedDate
+      validation.parsedDate,
+      validation.parsedDate
     );
 
     return res.status(200).json({
       success: true,
       report: {
         type: "daily",
-        date,
+        date: validation.dateString,
         readings,
         summary: calculateSummary(readings)
       }
@@ -106,22 +71,25 @@ const getDailyReport = async (req, res) => {
   }
 };
 
-// 2. Month-to-Date Report
+/**
+ * 2. MONTH-TO-DATE REPORT
+ * GET /api/reports/month-to-date?date=YYYY-MM-DD
+ * Calculates from day 1 of selected month through selected date (inclusive).
+ * If date query param is omitted, defaults to today's date in IST.
+ */
 const getMonthToDateReport = async (req, res) => {
   try {
-    const todayString = new Date().toLocaleDateString("en-CA", {
-      timeZone: "Asia/Kolkata"
-    });
+    const targetDate = req.query.date || getTodayInIndia();
 
-    const [year, month, day] = todayString.split("-").map(Number);
+    const validation = validateReportDate(targetDate);
+    if (!validation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: validation.error
+      });
+    }
 
-    const startDate = new Date(
-      Date.UTC(year, month - 1, 1)
-    );
-
-    const endDate = new Date(
-      Date.UTC(year, month - 1, day)
-    );
+    const { startDate, endDate, startDateString, endDateString } = getMonthToDateRange(validation.dateString);
 
     const readings = await fetchReadings(
       req.user.userId,
@@ -133,8 +101,8 @@ const getMonthToDateReport = async (req, res) => {
       success: true,
       report: {
         type: "month-to-date",
-        startDate: todayString.slice(0, 7) + "-01",
-        endDate: todayString,
+        startDate: startDateString,
+        endDate: endDateString,
         readings,
         summary: calculateSummary(readings)
       }
@@ -148,22 +116,25 @@ const getMonthToDateReport = async (req, res) => {
   }
 };
 
-// 3. Previous Full Month Report
+/**
+ * 3. PREVIOUS FULL MONTH REPORT
+ * GET /api/reports/previous-month?date=YYYY-MM-DD
+ * Calculates the entire previous calendar month immediately preceding the selected date's month.
+ * Handles month lengths (28, 29, 30, 31) and year boundary crossings (January -> December of previous year).
+ */
 const getPreviousMonthReport = async (req, res) => {
   try {
-    const todayString = new Date().toLocaleDateString("en-CA", {
-      timeZone: "Asia/Kolkata"
-    });
+    const targetDate = req.query.date || getTodayInIndia();
 
-    const [year, month] = todayString.split("-").map(Number);
+    const validation = validateReportDate(targetDate);
+    if (!validation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: validation.error
+      });
+    }
 
-    const startDate = new Date(
-      Date.UTC(year, month - 2, 1)
-    );
-
-    const endDate = new Date(
-      Date.UTC(year, month - 1, 0)
-    );
+    const { startDate, endDate, startDateString, endDateString } = getPreviousMonthRange(validation.dateString);
 
     const readings = await fetchReadings(
       req.user.userId,
@@ -175,8 +146,8 @@ const getPreviousMonthReport = async (req, res) => {
       success: true,
       report: {
         type: "previous-month",
-        startDate: startDate.toISOString().slice(0, 10),
-        endDate: endDate.toISOString().slice(0, 10),
+        startDate: startDateString,
+        endDate: endDateString,
         readings,
         summary: calculateSummary(readings)
       }
@@ -194,5 +165,6 @@ module.exports = {
   getDailyReport,
   getMonthToDateReport,
   getPreviousMonthReport,
-  calculateSummary
+  calculateSummary,
+  fetchReadings
 };

@@ -1,49 +1,35 @@
-
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const prisma = require("../config/prisma");
+const { generateToken } = require("../utils/jwt");
+const {
+  validateRegistration,
+  validateLogin,
+  normalizeEmail,
+  isValidEmail,
+  isValidPassword
+} = require("../utils/authValidation");
 
-// Generate JWT token
-const generateToken = (userId) => {
-  return jwt.sign(
-    { userId },
-    process.env.JWT_SECRET,
-    { expiresIn: "1d" }
-  );
-};
+const BCRYPT_SALT_ROUNDS = 12;
 
-// REGISTER USER
+/**
+ * REGISTER USER
+ * POST /api/auth/register
+ */
 const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const validation = validateRegistration(req.body);
 
-    // Validate required fields
-    if (!name || !email || !password) {
+    if (!validation.isValid) {
       return res.status(400).json({
         success: false,
-        message: "Name, email and password are required."
+        message: validation.error
       });
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
+    const { name, email, password } = validation.data;
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide a valid email address."
-      });
-    }
-
-    if (password.length < 8) {
-      return res.status(400).json({
-        success: false,
-        message: "Password must contain at least 8 characters."
-      });
-    }
-
-    // Check whether user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email: normalizedEmail }
+      where: { email }
     });
 
     if (existingUser) {
@@ -53,14 +39,12 @@ const register = async (req, res) => {
       });
     }
 
-    // Hash password
-    const passwordHash = await bcrypt.hash(password, 12);
+    const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
-    // Create user
     const user = await prisma.user.create({
       data: {
-        name: name.trim(),
-        email: normalizedEmail,
+        name,
+        email,
         passwordHash
       },
       select: {
@@ -79,9 +63,16 @@ const register = async (req, res) => {
       token,
       user
     });
-
   } catch (error) {
     console.error("Registration error:", error);
+
+    // Prisma unique constraint violation fallback (P2002)
+    if (error.code === "P2002") {
+      return res.status(409).json({
+        success: false,
+        message: "An account with this email already exists."
+      });
+    }
 
     return res.status(500).json({
       success: false,
@@ -90,22 +81,25 @@ const register = async (req, res) => {
   }
 };
 
-// LOGIN USER
+/**
+ * LOGIN USER
+ * POST /api/auth/login
+ */
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const validation = validateLogin(req.body);
 
-    if (!email || !password) {
+    if (!validation.isValid) {
       return res.status(400).json({
         success: false,
-        message: "Email and password are required."
+        message: validation.error
       });
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
+    const { email, password } = validation.data;
 
     const user = await prisma.user.findUnique({
-      where: { email: normalizedEmail }
+      where: { email }
     });
 
     if (!user) {
@@ -115,11 +109,7 @@ const login = async (req, res) => {
       });
     }
 
-    // Compare entered password with stored hash
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      user.passwordHash
-    );
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
 
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -141,7 +131,6 @@ const login = async (req, res) => {
         createdAt: user.createdAt
       }
     });
-
   } catch (error) {
     console.error("Login error:", error);
 
@@ -152,11 +141,21 @@ const login = async (req, res) => {
   }
 };
 
-// CHANGE PASSWORD
+/**
+ * CHANGE PASSWORD
+ * PUT /api/auth/change-password (Protected)
+ */
 const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
     const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized request."
+      });
+    }
 
     if (!currentPassword || !newPassword) {
       return res.status(400).json({
@@ -165,7 +164,7 @@ const changePassword = async (req, res) => {
       });
     }
 
-    if (typeof newPassword !== "string" || newPassword.length < 8) {
+    if (typeof newPassword !== "string" || !isValidPassword(newPassword)) {
       return res.status(400).json({
         success: false,
         message: "New password must contain at least 8 characters."
@@ -179,7 +178,6 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // Find the user to get existing password hash
     const user = await prisma.user.findUnique({
       where: { id: userId }
     });
@@ -191,11 +189,7 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // Verify current password with bcrypt
-    const isCurrentValid = await bcrypt.compare(
-      currentPassword,
-      user.passwordHash
-    );
+    const isCurrentValid = await bcrypt.compare(currentPassword, user.passwordHash);
 
     if (!isCurrentValid) {
       return res.status(401).json({
@@ -204,10 +198,8 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // Hash new password with 12 salt rounds
-    const newPasswordHash = await bcrypt.hash(newPassword, 12);
+    const newPasswordHash = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
 
-    // Update passwordHash in database
     await prisma.user.update({
       where: { id: userId },
       data: {
@@ -219,7 +211,6 @@ const changePassword = async (req, res) => {
       success: true,
       message: "Password changed successfully."
     });
-
   } catch (error) {
     console.error("Change password error:", error);
 
@@ -230,7 +221,10 @@ const changePassword = async (req, res) => {
   }
 };
 
-// UPDATE USER PROFILE
+/**
+ * UPDATE USER PROFILE
+ * PUT /api/auth/profile (Protected)
+ */
 const updateProfile = async (req, res) => {
   try {
     const { name, email } = req.body;
@@ -251,7 +245,7 @@ const updateProfile = async (req, res) => {
     }
 
     const trimmedName = typeof name === "string" ? name.trim() : "";
-    const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+    const normalized = normalizeEmail(email);
 
     if (!trimmedName) {
       return res.status(400).json({
@@ -260,17 +254,16 @@ const updateProfile = async (req, res) => {
       });
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    if (!isValidEmail(normalized)) {
       return res.status(400).json({
         success: false,
         message: "Please provide a valid email address."
       });
     }
 
-    // Check whether the email is already used by another user account
     const existingUser = await prisma.user.findFirst({
       where: {
-        email: normalizedEmail,
+        email: normalized,
         NOT: { id: userId }
       }
     });
@@ -282,12 +275,11 @@ const updateProfile = async (req, res) => {
       });
     }
 
-    // Update user profile in database
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
         name: trimmedName,
-        email: normalizedEmail
+        email: normalized
       },
       select: {
         id: true,
@@ -302,7 +294,6 @@ const updateProfile = async (req, res) => {
       message: "Profile updated successfully.",
       user: updatedUser
     });
-
   } catch (error) {
     console.error("Update profile error:", error);
 
@@ -321,6 +312,7 @@ const updateProfile = async (req, res) => {
 };
 
 module.exports = {
+  BCRYPT_SALT_ROUNDS,
   register,
   login,
   changePassword,

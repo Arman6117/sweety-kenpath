@@ -92,31 +92,20 @@ export default function Reports() {
   const [error, setError] = useState(null);
 
   const fetchReport = useCallback(async () => {
-    // Validate daily date input before dispatching request
-    if (activeTab === "daily") {
-      if (!selectedDate || !/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
-        setError("Please select a valid calendar date in YYYY-MM-DD format.");
-        return;
-      }
-      if (selectedDate > today) {
-        setError("Future dates are not allowed for daily reports.");
-        return;
-      }
+    if (!selectedDate || !/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
+      setError("Please select a valid calendar date in YYYY-MM-DD format.");
+      return;
+    }
+    if (selectedDate > today) {
+      setError("Future dates are not allowed for reports.");
+      return;
     }
 
     setIsLoading(true);
     setError(null);
 
     try {
-      let endpoint = "";
-      if (activeTab === "daily") {
-        endpoint = `/api/reports/daily?date=${selectedDate}`;
-      } else if (activeTab === "month-to-date") {
-        endpoint = "/api/reports/month-to-date";
-      } else if (activeTab === "previous-month") {
-        endpoint = "/api/reports/previous-month";
-      }
-
+      const endpoint = `/api/reports/${activeTab}?date=${selectedDate}`;
       const response = await api.get(endpoint);
       setReport(response.data?.report || null);
     } catch (err) {
@@ -132,68 +121,56 @@ export default function Reports() {
   }, [activeTab, selectedDate, today]);
 
   useEffect(() => {
-    let isMounted = true;
+    let ignore = false;
 
-    async function executeFetch() {
-      if (activeTab === "daily") {
-        if (!selectedDate || !/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
-          if (isMounted) {
-            setError("Please select a valid calendar date in YYYY-MM-DD format.");
-          }
-          return;
-        }
-        if (selectedDate > today) {
-          if (isMounted) {
-            setError("Future dates are not allowed for daily reports.");
-          }
-          return;
-        }
+    async function loadReport() {
+      if (!selectedDate || !/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
+        if (!ignore) setError("Please select a valid calendar date in YYYY-MM-DD format.");
+        return;
+      }
+      if (selectedDate > today) {
+        if (!ignore) setError("Future dates are not allowed for reports.");
+        return;
       }
 
-      setIsLoading(true);
-      setError(null);
+      if (!ignore) {
+        setIsLoading(true);
+        setError(null);
+      }
 
       try {
-        let endpoint = "";
-        if (activeTab === "daily") {
-          endpoint = `/api/reports/daily?date=${selectedDate}`;
-        } else if (activeTab === "month-to-date") {
-          endpoint = "/api/reports/month-to-date";
-        } else if (activeTab === "previous-month") {
-          endpoint = "/api/reports/previous-month";
-        }
-
+        const endpoint = `/api/reports/${activeTab}?date=${selectedDate}`;
         const response = await api.get(endpoint);
-        if (isMounted) {
+        if (!ignore) {
           setReport(response.data?.report || null);
         }
       } catch (err) {
-        if (isMounted) {
+        if (!ignore) {
           console.error("Fetch report error:", err);
-          const msg =
+          setError(
             err.response?.data?.message ||
-            "Unable to generate glucose report. Please check your connection and try again.";
-          setError(msg);
+              "Unable to generate glucose report. Please check your connection and try again."
+          );
           setReport(null);
         }
       } finally {
-        if (isMounted) {
+        if (!ignore) {
           setIsLoading(false);
         }
       }
     }
 
-    executeFetch();
+    loadReport();
 
     return () => {
-      isMounted = false;
+      ignore = true;
     };
   }, [activeTab, selectedDate, today]);
 
   const handleDateChange = (e) => {
     const newDate = e.target.value;
     if (newDate > today) {
-      setError("Future dates are not allowed for daily reports.");
+      setError("Future dates are not allowed for reports.");
       return;
     }
     setError(null);
@@ -522,26 +499,30 @@ export default function Reports() {
                 </button>
               </div>
 
-              {/* Date picker for Daily mode */}
-              {activeTab === "daily" && (
-                <div className="flex items-center gap-2">
-                  <label
-                    htmlFor="daily-report-date"
-                    className="flex items-center gap-1.5 text-xs font-semibold text-slate-500"
-                  >
-                    <Calendar size={15} className="text-slate-400" />
-                    <span>Report Date:</span>
-                  </label>
-                  <input
-                    id="daily-report-date"
-                    type="date"
-                    value={selectedDate}
-                    max={today}
-                    onChange={handleDateChange}
-                    className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-                  />
-                </div>
-              )}
+              {/* Date picker for Report mode */}
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="report-date-input"
+                  className="flex items-center gap-1.5 text-xs font-semibold text-slate-500"
+                >
+                  <Calendar size={15} className="text-slate-400" />
+                  <span>
+                    {activeTab === "daily"
+                      ? "Report Date:"
+                      : activeTab === "month-to-date"
+                      ? "As of Date:"
+                      : "Reference Date:"}
+                  </span>
+                </label>
+                <input
+                  id="report-date-input"
+                  type="date"
+                  value={selectedDate}
+                  max={today}
+                  onChange={handleDateChange}
+                  className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                />
+              </div>
             </div>
           </section>
 
